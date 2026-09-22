@@ -22,6 +22,7 @@
       }
     };
 
+    safeInit('preloader', initPreloader);
     safeInit('scrollEngine', initScrollEngine);
     safeInit('revealObserver', initRevealObserver);
     safeInit('statCounters', initStatCounters);
@@ -38,6 +39,62 @@
       safeInit('magneticButtons', initMagneticButtons);
     }
   });
+
+  /* ==========================================================================
+     01. SIGNATURE MOMENT 1: PRELOADER (Logo Reveal + Counter + Curtain Lift)
+     ========================================================================== */
+  function initPreloader() {
+    const preloader = document.getElementById('preloader');
+    const fillBar = document.getElementById('preloader-fill');
+    const counterText = document.getElementById('preloader-number');
+    const heroSection = document.getElementById('hero');
+
+    if (!preloader) return;
+
+    if (prefersReducedMotion) {
+      preloader.style.display = 'none';
+      if (heroSection) heroSection.classList.add('is-revealed');
+      return;
+    }
+
+    let progress = 0;
+    const duration = 650; // ms
+    const startTime = performance.now();
+
+    const updateLoader = (now) => {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      // Quad ease-out
+      progress = Math.floor(t * (2 - t) * 100);
+
+      if (fillBar) {
+        fillBar.style.transform = `scaleX(${progress / 100})`;
+      }
+      if (counterText) {
+        counterText.textContent = `${progress}%`;
+      }
+
+      if (t < 1) {
+        requestAnimationFrame(updateLoader);
+      } else {
+        // Complete - lift curtain
+        setTimeout(() => {
+          preloader.classList.add('is-loaded');
+          if (heroSection) {
+            heroSection.classList.add('is-revealed');
+          }
+
+          // Clean up DOM after curtain lift animation completes
+          setTimeout(() => {
+            preloader.style.display = 'none';
+            preloader.setAttribute('aria-hidden', 'true');
+          }, 850);
+        }, 120);
+      }
+    };
+
+    requestAnimationFrame(updateLoader);
+  }
 
   /* ==========================================================================
      02. PERFORMANCE ENGINE: SINGLE rAF SCROLL HANDLER (Passive, Cached Measurements)

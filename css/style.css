@@ -173,6 +173,109 @@ ul, ol {
 
 
 /* --------------------------------------------------------------------------
+   03. SIGNATURE MOMENT 1: PRELOADER (Curtain Lift & Percentage)
+   -------------------------------------------------------------------------- */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-root);
+  pointer-events: all;
+  will-change: transform;
+  transition: transform 0.75s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.preloader.is-loaded {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+.preloader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  max-width: 320px;
+  width: 100%;
+}
+
+.preloader-logo-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px var(--primary-glow), 0 0 10px rgba(47, 123, 255, 0.4);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transform: scale(0.9);
+  opacity: 0;
+  animation: preloader-logo-in 0.6s var(--ease-out-expo) forwards;
+}
+
+.preloader-logo-img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
+@keyframes preloader-logo-in {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.preloader-brand {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.preloader-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+
+.preloader-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+.preloader-status-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.preloader-number {
+  color: var(--primary-light);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
    04. BACKGROUND SYSTEM: FILM GRAIN, AMBIENT ORBS & CURSOR GLOW
    -------------------------------------------------------------------------- */
 /* Film-Grain Noise Overlay via inline SVG data-uri (feTurbulence at 4% opacity) */
