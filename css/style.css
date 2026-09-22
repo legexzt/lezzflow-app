@@ -1194,6 +1194,672 @@ ul, ol {
 }
 
 /* --------------------------------------------------------------------------
+   11B. THE ECOSYSTEM (Three Apps • Video Centerpiece • Flow Strip)
+   -------------------------------------------------------------------------- */
+.ecosystem-section {
+  position: relative;
+  z-index: 10;
+}
+
+/* Video Showcase Centerpiece */
+.ecosystem-showcase {
+  margin-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+.ecosystem-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 380px;
+  max-height: 560px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface-1);
+  border: 1px solid rgba(47, 123, 255, 0.32);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.65), 0 0 45px rgba(47, 123, 255, 0.16);
+  overflow: hidden;
+  will-change: transform;
+}
+
+/* Real Video Element (covers placeholder when loaded) */
+.ecosystem-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s var(--ease-out-expo);
+}
+
+.ecosystem-video.is-loaded {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Pure-CSS Animated Fallback Placeholder */
+.ecosystem-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  overflow: hidden;
+  background: var(--bg-root);
+}
+
+.ecosystem-fallback-bg {
+  position: absolute;
+  inset: -25%;
+  background: 
+    radial-gradient(ellipse 65% 55% at 20% 30%, rgba(47, 123, 255, 0.28), transparent 65%),
+    radial-gradient(ellipse 55% 50% at 80% 70%, rgba(255, 178, 36, 0.2), transparent 65%),
+    radial-gradient(ellipse 50% 50% at 50% 20%, rgba(56, 189, 248, 0.2), transparent 65%),
+    linear-gradient(180deg, #090e1a 0%, #05070d 100%);
+  animation: ecoGradientShift 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes ecoGradientShift {
+  0% {
+    transform: scale(1) translate(0, 0);
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    transform: scale(1.08) translate(-1.5%, 2%);
+    filter: hue-rotate(15deg);
+  }
+  100% {
+    transform: scale(1) translate(1.5%, -1%);
+    filter: hue-rotate(-10deg);
+  }
+}
+
+.ecosystem-fallback-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, #000 35%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, #000 35%, transparent 85%);
+  pointer-events: none;
+}
+
+.ecosystem-fallback-badge {
+  position: relative;
+  z-index: 3;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.95rem;
+  background: rgba(14, 21, 38, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent-warm);
+}
+
+.ecosystem-visual-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ecosystem-path-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.eco-path-track {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 3;
+}
+
+.eco-path-active {
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 10 12;
+  animation: ecoDashMove 2.5s linear infinite;
+}
+
+@keyframes ecoDashMove {
+  to {
+    stroke-dashoffset: -44;
+  }
+}
+
+/* 3 Pulsing Nodes */
+.eco-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.45rem;
+  pointer-events: auto;
+  z-index: 4;
+}
+
+.eco-node-customer {
+  left: 22.2%;
+  top: 66.7%;
+}
+
+.eco-node-mart {
+  left: 50%;
+  top: 31%;
+}
+
+.eco-node-delivery {
+  left: 77.8%;
+  top: 66.7%;
+}
+
+.eco-node-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s var(--ease-out-expo);
+}
+
+.eco-node:hover .eco-node-icon-box {
+  transform: scale(1.12);
+}
+
+.eco-node-customer .eco-node-icon-box {
+  border-color: var(--primary);
+  color: var(--primary-bright);
+  box-shadow: 0 0 24px rgba(47, 123, 255, 0.45);
+}
+
+.eco-node-mart .eco-node-icon-box {
+  border-color: var(--accent-warm);
+  color: var(--accent-warm);
+  box-shadow: 0 0 24px rgba(255, 178, 36, 0.45);
+}
+
+.eco-node-delivery .eco-node-icon-box {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.45);
+}
+
+.eco-node-pulse {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  animation: ecoPulseRing 2.4s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.eco-node-customer .eco-node-pulse {
+  color: var(--primary);
+}
+
+.eco-node-mart .eco-node-pulse {
+  color: var(--accent-warm);
+  animation-delay: 0.8s;
+}
+
+.eco-node-delivery .eco-node-pulse {
+  color: #38bdf8;
+  animation-delay: 1.6s;
+}
+
+@keyframes ecoPulseRing {
+  0% {
+    transform: translateX(-50%) scale(0.9);
+    opacity: 0.85;
+  }
+  60% {
+    transform: translateX(-50%) scale(1.5);
+    opacity: 0.25;
+  }
+  100% {
+    transform: translateX(-50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+.eco-node-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  background: rgba(9, 14, 26, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.eco-node-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+
+.eco-node-label {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.eco-node-sub {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.ecosystem-fallback-status {
+  position: relative;
+  z-index: 3;
+  align-self: center;
+  margin-top: auto;
+}
+
+.eco-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(9, 14, 26, 0.85);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 1.1rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.eco-status-signal {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* Three App Cards Grid */
+.ecosystem-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 2.5vw, 2.25rem);
+  margin-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+.ecosystem-card {
+  background: linear-gradient(145deg, rgba(19, 29, 53, 0.7) 0%, rgba(9, 14, 26, 0.9) 100%);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.75rem, 3vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.75rem;
+  transition: transform 0.35s var(--ease-out-expo), border-color 0.35s ease, box-shadow 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45);
+}
+
+.ecosystem-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(94, 155, 255, 0.4);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 32px var(--primary-glow-subtle);
+}
+
+.eco-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.eco-card-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--ease-out-expo);
+}
+
+.ecosystem-card:hover .eco-card-icon-wrap {
+  transform: scale(1.08);
+}
+
+.eco-icon-customer {
+  background: rgba(47, 123, 255, 0.12);
+  border: 1px solid rgba(47, 123, 255, 0.3);
+  color: var(--primary-bright);
+}
+
+.eco-icon-mart {
+  background: rgba(255, 178, 36, 0.12);
+  border: 1px solid rgba(255, 178, 36, 0.3);
+  color: var(--accent-warm);
+}
+
+.eco-icon-delivery {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+}
+
+.eco-app-role-pill {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.3rem 0.75rem;
+}
+
+.eco-card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.eco-card-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.eco-card-tagline {
+  font-size: 0.98rem;
+  font-style: italic;
+  color: var(--primary-bright);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.eco-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.eco-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.eco-feature-list .check-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--primary-light);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.eco-card-footer {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+}
+
+.eco-built-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.eco-built-target {
+  color: var(--accent-warm);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Flow Strip (4 Steps Timeline) */
+.ecosystem-flow-strip {
+  background: rgba(9, 14, 26, 0.78);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: clamp(2rem, 4vw, 3.25rem);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.eco-flow-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 2.5rem;
+  justify-content: center;
+}
+
+.eco-flow-badge-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent-warm);
+  text-transform: uppercase;
+}
+
+.eco-flow-timeline {
+  position: relative;
+  width: 100%;
+}
+
+.eco-flow-line {
+  position: absolute;
+  top: 24px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.eco-flow-line-pulse {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, var(--primary-light) 40%, var(--accent-warm) 60%, transparent 100%);
+  background-size: 200% 100%;
+  animation: ecoFlowStream 3s linear infinite;
+}
+
+@keyframes ecoFlowStream {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.eco-flow-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  position: relative;
+  z-index: 2;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.eco-flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.9rem;
+}
+
+.eco-step-num-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px var(--primary-glow-subtle);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.eco-step-num {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+.eco-flow-step:hover .eco-step-num-wrap {
+  transform: scale(1.1);
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 20px var(--accent-warm-glow);
+}
+
+.eco-step-text {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  max-width: 180px;
+}
+
+/* Ecosystem Responsive Adjustments */
+@media (max-width: 960px) {
+  .ecosystem-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .eco-flow-steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1.5rem;
+  }
+
+  .eco-flow-line {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .ecosystem-video-frame {
+    min-height: 280px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .eco-node-icon-box {
+    width: 42px;
+    height: 42px;
+  }
+
+  .eco-node-pulse {
+    width: 42px;
+    height: 42px;
+  }
+
+  .eco-node-icon-box svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .eco-node-meta {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .eco-node-label {
+    font-size: 0.78rem;
+  }
+
+  .eco-node-sub {
+    display: none;
+  }
+
+  .eco-flow-steps {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .eco-flow-step {
+    flex-direction: row;
+    text-align: left;
+    gap: 1.25rem;
+  }
+
+  .eco-step-text {
+    max-width: none;
+    font-size: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ecosystem-fallback-bg,
+  .eco-path-active,
+  .eco-node-pulse,
+  .eco-flow-line-pulse {
+    animation: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
    12. SIGNATURE MOMENT 6: 3D TILT CARDS (Customers & Sellers)
    -------------------------------------------------------------------------- */
 .split-layout {

@@ -28,6 +28,7 @@
     safeInit('mobileMenu', initMobileMenu);
     safeInit('waitlist', initWaitlist);
     safeInit('anchorScrolling', initAnchorScrolling);
+    safeInit('ecosystemVideo', initEcosystemVideo);
 
     // Desktop-only motion enhancements
     if (!isTouchDevice && !prefersReducedMotion) {
@@ -619,6 +620,59 @@
         }
       });
     });
+  }
+
+  /* ==========================================================================
+     13. ECOSYSTEM VIDEO CONTROLLER (IntersectionObserver Play/Pause & Fallback)
+     ========================================================================== */
+  function initEcosystemVideo() {
+    const video = document.querySelector('.ecosystem-video');
+    if (!video) return;
+
+    // Gracefully handle video loading: only reveal when video is actually ready with playable data
+    const handleLoaded = () => {
+      if (video.videoWidth > 0 || video.readyState >= 2) {
+        video.classList.add('is-loaded');
+      }
+    };
+
+    if (video.readyState >= 2) {
+      handleLoaded();
+    } else {
+      video.addEventListener('canplay', handleLoaded, { once: true });
+      video.addEventListener('playing', handleLoaded, { once: true });
+      video.addEventListener('loadeddata', handleLoaded, { once: true });
+    }
+
+    // If video file does not exist (404 or missing asset), keep the CSS fallback placeholder visible
+    video.addEventListener('error', () => {
+      video.classList.remove('is-loaded');
+    });
+
+    if (prefersReducedMotion) {
+      video.pause();
+      return;
+    }
+
+    // IntersectionObserver: play when scrolled into view, pause when out of view (saves battery)
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              // Video play was prevented or asset missing; safe catch
+            });
+          }
+        } else {
+          video.pause();
+        }
+      });
+    }, {
+      threshold: 0.15
+    });
+
+    videoObserver.observe(video);
   }
 
 })();

@@ -69,6 +69,7 @@
 
         <nav class="nav-links" id="desktop-nav" aria-label="Main Navigation">
           <a href="#how-it-works" class="nav-anchor">How It Works</a>
+          <a href="#ecosystem" class="nav-anchor">Ecosystem</a>
           <a href="#customers" class="nav-anchor">For Shoppers</a>
           <a href="#sellers" class="nav-anchor">For Merchants</a>
           <a href="#partners" class="nav-anchor">Delivery</a>
@@ -96,6 +97,7 @@
       <div class="mobile-drawer-inner">
         <div class="mobile-nav-links">
           <a href="#how-it-works" class="mobile-nav-link">How It Works</a>
+          <a href="#ecosystem" class="mobile-nav-link">Ecosystem</a>
           <a href="#customers" class="mobile-nav-link">For Shoppers</a>
           <a href="#sellers" class="mobile-nav-link">For Merchants</a>
           <a href="#partners" class="mobile-nav-link">Delivery Partners</a>
@@ -405,6 +407,365 @@
               </div>
             </article>
 
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           04B. THE ECOSYSTEM (Three Apps • Video Centerpiece • Flow Strip)
+           ==================================================================== -->
+      <section class="section ecosystem-section section-below-fold" id="ecosystem" aria-labelledby="ecosystem-heading">
+        <div class="section-container">
+
+          <!-- Section Header -->
+          <div class="section-header reveal-item">
+            <p class="section-eyebrow">THE ECOSYSTEM</p>
+            <h2 class="section-title" id="ecosystem-heading">Three apps. One seamless flow.</h2>
+            <p class="section-subtitle">
+              Customers, local kiranas, and delivery partners synchronized in real time to power instant neighbourhood commerce.
+            </p>
+          </div>
+
+          <!-- Animated Video Showcase (Centerpiece) -->
+          <div class="ecosystem-showcase reveal-item" id="ecosystem-showcase">
+            <div class="ecosystem-video-frame">
+
+              <!-- Graceful Pure-CSS Animated Fallback Placeholder -->
+              <div class="ecosystem-fallback" id="ecosystem-fallback" aria-hidden="true">
+                <div class="ecosystem-fallback-bg"></div>
+                <div class="ecosystem-fallback-grid"></div>
+
+                <!-- Live Simulation Header Pill -->
+                <div class="ecosystem-fallback-badge">
+                  <span class="pulse-dot"></span>
+                  <span>HYPERLOCAL TRI-SYNC SIMULATION</span>
+                </div>
+
+                <!-- Path & 3 Pulsing Nodes Visualization -->
+                <div class="ecosystem-visual-canvas">
+                  <!-- SVG Connecting Loop with Animated Moving Dot -->
+                  <svg class="ecosystem-path-svg" viewBox="0 0 900 420" fill="none" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                      <linearGradient id="ecoPathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#2f7bff" stop-opacity="0.85" />
+                        <stop offset="50%" stop-color="#ffb224" stop-opacity="0.9" />
+                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.85" />
+                      </linearGradient>
+                      <filter id="ecoGlow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="6" result="blur" />
+                        <feMerge>
+                          <feMergeNode in="blur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                    </defs>
+
+                    <!-- Subtle Track Background -->
+                    <path
+                      d="M 200 280 C 240 160, 360 130, 450 130 C 540 130, 660 160, 700 280 C 630 370, 270 370, 200 280 Z"
+                      class="eco-path-track"
+                      stroke="rgba(255, 255, 255, 0.08)"
+                      stroke-width="3"
+                    />
+
+                    <!-- Animated Flowing Dashed Path -->
+                    <path
+                      id="ecoFlowPath"
+                      d="M 200 280 C 240 160, 360 130, 450 130 C 540 130, 660 160, 700 280 C 630 370, 270 370, 200 280 Z"
+                      class="eco-path-active"
+                      stroke="url(#ecoPathGrad)"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-dasharray="10 12"
+                    />
+
+                    <!-- Moving dot along the path (SMIL universal SVG support) -->
+                    <g filter="url(#ecoGlow)">
+                      <circle r="7" fill="#ffffff">
+                        <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
+                          <mpath href="#ecoFlowPath" />
+                        </animateMotion>
+                      </circle>
+                      <circle r="4" fill="#ffb224">
+                        <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
+                          <mpath href="#ecoFlowPath" />
+                        </animateMotion>
+                      </circle>
+                    </g>
+                  </svg>
+
+                  <!-- 3 Pulsing Nodes: Customer / Mart / Delivery -->
+                  <!-- Customer Node (Left) -->
+                  <div class="eco-node eco-node-customer">
+                    <div class="eco-node-pulse"></div>
+                    <div class="eco-node-icon-box">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                      </svg>
+                    </div>
+                    <div class="eco-node-meta">
+                      <span class="eco-node-badge">APP 01</span>
+                      <strong class="eco-node-label">Customer</strong>
+                      <span class="eco-node-sub">Instant Demand</span>
+                    </div>
+                  </div>
+
+                  <!-- Mart Node (Top Center) -->
+                  <div class="eco-node eco-node-mart">
+                    <div class="eco-node-pulse"></div>
+                    <div class="eco-node-icon-box">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                      </svg>
+                    </div>
+                    <div class="eco-node-meta">
+                      <span class="eco-node-badge">APP 02</span>
+                      <strong class="eco-node-label">Mart</strong>
+                      <span class="eco-node-sub">Kirana Stock</span>
+                    </div>
+                  </div>
+
+                  <!-- Delivery Node (Right) -->
+                  <div class="eco-node eco-node-delivery">
+                    <div class="eco-node-pulse"></div>
+                    <div class="eco-node-icon-box">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="18.5" cy="17.5" r="3.5"/>
+                        <circle cx="5.5" cy="17.5" r="3.5"/>
+                        <circle cx="15" cy="5" r="1"/>
+                        <path d="M12 17.5V14l-3-3 4-3 2 3h2"/>
+                      </svg>
+                    </div>
+                    <div class="eco-node-meta">
+                      <span class="eco-node-badge">APP 03</span>
+                      <strong class="eco-node-label">Delivery</strong>
+                      <span class="eco-node-sub">10-Min Dispatch</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Simulation Footer Pill -->
+                <div class="ecosystem-fallback-status">
+                  <span class="eco-status-pill">
+                    <span class="eco-status-signal"></span>
+                    <span class="eco-status-text">Connected Loop: <strong>Customer</strong> → <strong>Mart</strong> → <strong>Delivery</strong></span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Centerpiece Video Element -->
+              <video
+                class="ecosystem-video"
+                src="assets/videos/ecosystem-flow.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                aria-label="LezzFlow 3-App Connected Ecosystem Video"
+              ></video>
+
+            </div>
+          </div>
+
+          <!-- Three App Cards (Responsive Grid) -->
+          <div class="ecosystem-cards-grid">
+
+            <!-- Card 1: LezzFlow (Customer app) -->
+            <article class="ecosystem-card reveal-item delay-1">
+              <div class="eco-card-header">
+                <div class="eco-card-icon-wrap eco-icon-customer">
+                  <svg class="eco-card-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                </div>
+                <span class="eco-app-role-pill">CUSTOMER APP</span>
+              </div>
+
+              <div class="eco-card-body">
+                <h3 class="eco-card-title">LezzFlow</h3>
+                <p class="eco-card-tagline">“Your neighbourhood, on demand.”</p>
+                <ul class="eco-feature-list" aria-label="Customer App Features">
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Order from nearby stores in minutes</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Live GPS order tracking</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Secure UPI payments</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Ratings &amp; re-order in one tap</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="eco-card-footer">
+                <span class="eco-built-label">Built for:</span>
+                <span class="eco-built-target">customers</span>
+              </div>
+            </article>
+
+            <!-- Card 2: LezzFlow Mart (Seller app) -->
+            <article class="ecosystem-card reveal-item delay-2">
+              <div class="eco-card-header">
+                <div class="eco-card-icon-wrap eco-icon-mart">
+                  <svg class="eco-card-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 3h18v18H3z"/>
+                    <path d="M3 9h18"/>
+                    <path d="M9 21V9"/>
+                  </svg>
+                </div>
+                <span class="eco-app-role-pill">SELLER APP</span>
+              </div>
+
+              <div class="eco-card-body">
+                <h3 class="eco-card-title">LezzFlow Mart</h3>
+                <p class="eco-card-tagline">“Your kirana store, gone digital.”</p>
+                <ul class="eco-feature-list" aria-label="Mart App Features">
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Go online in 10 minutes, zero commission onboarding</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Instant order alerts &amp; packing flow</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>AI demand-vs-availability insights</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Simple inventory &amp; billing</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="eco-card-footer">
+                <span class="eco-built-label">Built for:</span>
+                <span class="eco-built-target">local shopkeepers</span>
+              </div>
+            </article>
+
+            <!-- Card 3: LezzFlow Delivery (Rider app) -->
+            <article class="ecosystem-card reveal-item delay-3">
+              <div class="eco-card-header">
+                <div class="eco-card-icon-wrap eco-icon-delivery">
+                  <svg class="eco-card-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="12 2 19 21 12 17 5 21 12 2"/>
+                  </svg>
+                </div>
+                <span class="eco-app-role-pill">RIDER APP</span>
+              </div>
+
+              <div class="eco-card-body">
+                <h3 class="eco-card-title">LezzFlow Delivery</h3>
+                <p class="eco-card-tagline">“Earn on every kilometre.”</p>
+                <ul class="eco-feature-list" aria-label="Rider App Features">
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Accept nearby pickup tasks</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Smart route optimization</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Live navigation &amp; proof of delivery</span>
+                  </li>
+                  <li>
+                    <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Daily earnings dashboard</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="eco-card-footer">
+                <span class="eco-built-label">Built for:</span>
+                <span class="eco-built-target">delivery partners</span>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- Flow Strip (4 numbered steps with animated connecting line) -->
+          <div class="ecosystem-flow-strip reveal-item delay-4" aria-label="Order Journey Flow">
+            <div class="eco-flow-header">
+              <span class="pulse-dot"></span>
+              <span class="eco-flow-badge-title">ONE ORDER’S JOURNEY</span>
+            </div>
+
+            <div class="eco-flow-timeline">
+              <div class="eco-flow-line" aria-hidden="true">
+                <div class="eco-flow-line-pulse"></div>
+              </div>
+
+              <ol class="eco-flow-steps">
+                <li class="eco-flow-step">
+                  <div class="eco-step-num-wrap">
+                    <span class="eco-step-num">1</span>
+                  </div>
+                  <p class="eco-step-text">Customer places order</p>
+                </li>
+
+                <li class="eco-flow-step">
+                  <div class="eco-step-num-wrap">
+                    <span class="eco-step-num">2</span>
+                  </div>
+                  <p class="eco-step-text">Mart packs it fresh</p>
+                </li>
+
+                <li class="eco-flow-step">
+                  <div class="eco-step-num-wrap">
+                    <span class="eco-step-num">3</span>
+                  </div>
+                  <p class="eco-step-text">Rider picks up &amp; delivers</p>
+                </li>
+
+                <li class="eco-flow-step">
+                  <div class="eco-step-num-wrap">
+                    <span class="eco-step-num">4</span>
+                  </div>
+                  <p class="eco-step-text">Doorstep in minutes</p>
+                </li>
+              </ol>
+            </div>
           </div>
 
         </div>
@@ -925,6 +1286,7 @@
             <div class="footer-col-heading">Architecture</div>
             <ul class="footer-links-list">
               <li><a href="#how-it-works">How It Works</a></li>
+              <li><a href="#ecosystem">Ecosystem</a></li>
               <li><a href="#customers">For Shoppers</a></li>
               <li><a href="#sellers">For Merchants</a></li>
               <li><a href="#partners">Delivery Fleet</a></li>
