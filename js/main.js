@@ -11,21 +11,30 @@
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouchDevice = window.matchMedia('(hover: none) or (pointer: coarse)').matches;
 
-  // DOM Content Loaded Bootstrapper
+  // DOM Content Loaded Bootstrapper — each init is isolated so one
+  // failure can never prevent the rest (menu, waitlist) from working.
   document.addEventListener('DOMContentLoaded', () => {
-    initScrollEngine();
-    initRevealObserver();
-    initStatCounters();
-    initMobileMenu();
-    initWaitlist();
-    initAnchorScrolling();
+    const safeInit = (name, fn) => {
+      try {
+        fn();
+      } catch (err) {
+        console.warn(`[lezzflow] ${name} failed:`, err);
+      }
+    };
+
+    safeInit('scrollEngine', initScrollEngine);
+    safeInit('revealObserver', initRevealObserver);
+    safeInit('statCounters', initStatCounters);
+    safeInit('mobileMenu', initMobileMenu);
+    safeInit('waitlist', initWaitlist);
+    safeInit('anchorScrolling', initAnchorScrolling);
 
     // Desktop-only motion enhancements
     if (!isTouchDevice && !prefersReducedMotion) {
-      initCursorGlow();
-      initHeroLogoParallax();
-      initCard3DTilt();
-      initMagneticButtons();
+      safeInit('cursorGlow', initCursorGlow);
+      safeInit('heroLogoParallax', initHeroLogoParallax);
+      safeInit('card3DTilt', initCard3DTilt);
+      safeInit('magneticButtons', initMagneticButtons);
     }
   });
 
@@ -151,6 +160,12 @@
       const suffix = element.getAttribute('data-suffix') || '';
       const prefix = element.getAttribute('data-prefix') || '';
       const decimals = parseInt(element.getAttribute('data-decimals') || '0', 10);
+
+      // Never render NaN: if the target is not a valid number, keep the
+      // static HTML value (which already holds the correct final text).
+      if (!Number.isFinite(targetVal)) {
+        return;
+      }
 
       if (prefersReducedMotion) {
         const formatted = decimals > 0 ? targetVal.toFixed(decimals) : targetVal.toString();

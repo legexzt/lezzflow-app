@@ -130,22 +130,32 @@ ul, ol {
   outline-offset: 4px;
 }
 
-/* Skip link for screen readers */
+/* Skip link for keyboard users: fully hidden until focused */
 .skip-link {
-  position: fixed;
-  top: 1rem;
-  left: 1rem;
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
   z-index: 10000;
   padding: 0.75rem 1.5rem;
   background: var(--primary);
   color: #ffffff;
   font-weight: 600;
   border-radius: var(--radius-sm);
-  transform: translateY(-200%);
-  transition: transform 0.25s ease;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
-.skip-link:focus {
-  transform: translateY(0);
+.skip-link:focus,
+.skip-link:focus-visible {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
 }
 
 .sr-only {
@@ -566,7 +576,7 @@ ul, ol {
   transform: translateY(-4px) rotate(-45deg);
 }
 
-/* Mobile Navigation Drawer */
+/* Mobile Navigation Drawer: hidden off-canvas and inert until opened */
 .mobile-drawer {
   display: none;
   position: fixed;
@@ -577,12 +587,18 @@ ul, ol {
   -webkit-backdrop-filter: blur(25px);
   z-index: 999;
   transform: translateY(-100%);
-  transition: transform 0.45s var(--ease-out-expo);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.45s var(--ease-out-expo), opacity 0.3s ease, visibility 0.3s;
   will-change: transform;
 }
 
 .mobile-drawer.is-open {
   transform: translateY(0);
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .mobile-drawer-inner {
