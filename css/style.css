@@ -68,6 +68,11 @@
   padding: 0;
 }
 
+html, body {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
 html {
   font-size: 16px;
   scroll-behavior: smooth;
@@ -82,11 +87,16 @@ html {
 }
 
 body {
-  overflow-x: hidden;
   position: relative;
   background-color: var(--bg-root);
   color: var(--text-primary);
   min-height: 100vh;
+}
+
+.site-container {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 img, picture, video, canvas, svg {
@@ -150,108 +160,7 @@ ul, ol {
   border: 0;
 }
 
-/* --------------------------------------------------------------------------
-   03. SIGNATURE MOMENT 1: PRELOADER (Curtain Lift & Percentage)
-   -------------------------------------------------------------------------- */
-.preloader {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-root);
-  pointer-events: all;
-  will-change: transform;
-  transition: transform 0.75s cubic-bezier(0.77, 0, 0.175, 1);
-}
 
-.preloader.is-loaded {
-  transform: translateY(-100%);
-  pointer-events: none;
-}
-
-.preloader-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem;
-  max-width: 320px;
-  width: 100%;
-}
-
-.preloader-logo-badge {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 40px var(--primary-glow), 0 0 10px rgba(47, 123, 255, 0.4);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-  transform: scale(0.9);
-  opacity: 0;
-  animation: preloader-logo-in 0.6s var(--ease-out-expo) forwards;
-}
-
-.preloader-logo-img {
-  width: 58px;
-  height: 58px;
-  object-fit: contain;
-}
-
-@keyframes preloader-logo-in {
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.preloader-brand {
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-  margin-bottom: 1.5rem;
-}
-
-.preloader-track {
-  width: 100%;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  margin-bottom: 0.85rem;
-}
-
-.preloader-fill {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-  transform: scaleX(0);
-  transform-origin: left;
-  will-change: transform;
-}
-
-.preloader-status-row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-}
-
-.preloader-number {
-  color: var(--primary-light);
-  font-weight: 700;
-}
 
 /* --------------------------------------------------------------------------
    04. BACKGROUND SYSTEM: FILM GRAIN, AMBIENT ORBS & CURSOR GLOW
@@ -335,7 +244,13 @@ ul, ol {
   opacity: 1;
 }
 
-@media (hover: none) or (pointer: coarse) {
+@media (hover: none) {
+  .cursor-glow {
+    display: none !important;
+  }
+}
+
+@media (pointer: coarse) {
   .cursor-glow {
     display: none !important;
   }
@@ -767,10 +682,10 @@ ul, ol {
   box-shadow: 0 0 8px var(--accent-warm-glow);
 }
 
-/* Giant Headline with Per-Line Mask Slide-Up */
+/* Fluid Headline */
 .hero-headline {
   font-family: var(--font-display);
-  font-size: clamp(2.85rem, 8.5vw, 6.75rem);
+  font-size: clamp(2.1rem, 11vw, 6.75rem);
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.04em;
@@ -786,22 +701,14 @@ ul, ol {
 
 .hero-mask-inner {
   display: block;
-  transform: translateY(115%);
-  opacity: 0;
-  will-change: transform, opacity;
-  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
+  transform: none;
+  opacity: 1;
 }
 
-.hero-section.is-revealed .hero-mask-line:nth-child(1) .hero-mask-inner {
-  transform: translateY(0);
+/* Robust hero visibility without JS requirement */
+.hero-section .reveal-item {
   opacity: 1;
-  transition-delay: 0.1s;
-}
-
-.hero-section.is-revealed .hero-mask-line:nth-child(2) .hero-mask-inner {
-  transform: translateY(0);
-  opacity: 1;
-  transition-delay: 0.25s;
+  transform: none;
 }
 
 .hero-subtext {
@@ -891,6 +798,8 @@ ul, ol {
   z-index: 15;
   transform-style: preserve-3d;
   will-change: transform;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .hero-emblem-badge {
@@ -2039,7 +1948,7 @@ ul, ol {
 
 .monumental-text {
   font-family: var(--font-display);
-  font-size: clamp(4.5rem, 16vw, 13.5rem);
+  font-size: clamp(2.5rem, 15vw, 13.5rem);
   font-weight: 800;
   letter-spacing: -0.05em;
   line-height: 0.88;
@@ -2139,17 +2048,28 @@ ul, ol {
   }
   .nav-toggle {
     display: flex;
+    min-width: 44px;
+    min-height: 44px;
   }
   .mobile-drawer {
     display: block;
   }
   .hero-floating-emblem {
     position: static;
-    margin-top: 1rem;
+    margin-top: 1.25rem;
     align-self: flex-start;
+    max-width: 100%;
   }
   .hero-spec-chip {
     display: none;
+  }
+  /* Disable sticky stacking on mobile/touch to prevent overlap and jank */
+  .stack-card {
+    position: static !important;
+    transform: none !important;
+  }
+  .stacking-deck {
+    gap: 1.75rem;
   }
   .input-action-group {
     flex-direction: column;
@@ -2158,6 +2078,7 @@ ul, ol {
   }
   .btn-submit {
     width: 100%;
+    min-height: 44px;
   }
 }
 
@@ -2165,30 +2086,156 @@ ul, ol {
   :root {
     --nav-height: 72px;
   }
-  .footer-top-grid {
-    grid-template-columns: 1fr;
+
+  /* Compact sections on mobile */
+  .section {
+    padding: 3.5rem 0;
   }
-  .footer-bottom-row {
-    flex-direction: column;
-    align-items: flex-start;
+  .section-container {
+    padding-inline: 1.1rem;
   }
-  .role-selector-wrap {
-    flex-direction: column;
+
+  /* Hero section adjustments */
+  .hero-section {
+    padding-top: calc(var(--nav-height) + 1.5rem);
+    padding-bottom: 3.5rem;
+    min-height: auto;
   }
-  .role-pill {
-    width: 100%;
-    text-align: center;
-  }
-  .stats-counters-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .hero-subtext {
+    font-size: 1rem;
+    line-height: 1.55;
+    margin-bottom: 1.75rem;
   }
   .hero-cta-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.85rem;
   }
   .hero-cta-row .btn {
     width: 100%;
+  }
+
+  /* Marquee: compact and slower on small viewports */
+  .marquee-strip {
+    padding: 0.75rem 0;
+  }
+  .marquee-group {
+    font-size: 0.75rem;
+    gap: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .marquee-track {
+    animation-duration: 45s;
+  }
+
+  /* Stats grid: single column with tighter padding */
+  .stats-band-box {
+    padding: 1.75rem 1.25rem;
+  }
+  .stats-band-header {
+    margin-bottom: 2rem;
+  }
+  .stats-counters-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  .stat-counter-block {
+    padding-left: 1.25rem;
+  }
+
+  /* Waitlist and role pills */
+  .role-selector-wrap {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .role-pill {
+    width: 100%;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .waitlist-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  /* All buttons & inputs min-height 44px */
+  button,
+  input,
+  .btn,
+  .role-pill {
+    min-height: 44px;
+  }
+
+  /* Footer single column and fluid monumental wordmark */
+  .footer-top-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .footer-bottom-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  .footer-monumental-wordmark {
+    padding: 0.75rem 0;
+    margin-bottom: 1.5rem;
+  }
+  .monumental-text {
+    font-size: clamp(2.2rem, 14vw, 5.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  /* Navbar brand text and pill badge */
+  .nav-brand-text {
+    font-size: 1.15rem;
+  }
+  .nav-pill-badge {
+    display: none;
+  }
+  .nav-toggle {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Hero floating emblem: compact and non-overflowing */
+  .hero-floating-emblem {
+    max-width: 100%;
+    padding: 0.6rem 0.85rem 0.6rem 0.6rem;
+    gap: 0.75rem;
+  }
+  .hero-emblem-badge {
+    width: 48px;
+    height: 48px;
+  }
+  .hero-emblem-img {
+    width: 40px;
+    height: 40px;
+  }
+  .hero-emblem-title {
+    font-size: 1.1rem;
+  }
+
+  /* Team grid: single column */
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ultra-narrow container and card padding */
+  .section-container {
+    padding-inline: 1rem;
+  }
+  .waitlist-card {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Monumental wordmark scales down to fit 320px safely */
+  .monumental-text {
+    font-size: clamp(2rem, 13vw, 4rem);
   }
 }
 
@@ -2203,9 +2250,6 @@ ul, ol {
     scroll-behavior: auto !important;
   }
 
-  .preloader {
-    display: none !important;
-  }
 
   .marquee-track {
     animation: none !important;
