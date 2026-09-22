@@ -4,1115 +4,1009 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>lezzflow. — Your neighbourhood, delivered in minutes.</title>
-  <meta name="description" content="LezzFlow is a hyperlocal commerce platform connecting customers with verified nearby local stores — kirana shops, pharmacies, and specialty retailers with real-time stock and under-15-minute delivery.">
-  <meta name="keywords" content="hyperlocal commerce, quick commerce, kirana delivery, local stores, SIH 2026, Smart India Hackathon, grocery delivery">
+  <meta name="description" content="LezzFlow is a pre-launch hyperlocal commerce platform connecting customers with verified nearby local stores with real-time shelf inventory and sub-10 minute delivery targets.">
+  <meta name="keywords" content="hyperlocal commerce, quick commerce, kirana delivery, local stores, SIH 2026, Smart India Hackathon, neighbourhood shopping">
   <meta name="author" content="Team legezt">
-  
+
   <!-- Open Graph / Meta -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="lezzflow. — Hyperlocal Commerce Platform">
-  <meta property="og:description" content="Your neighbourhood stores, now one tap away. Real-time shelf inventory and under-15-minute delivery.">
+  <meta property="og:description" content="Your neighbourhood stores, now one tap away. Real-time shelf inventory and under-10-minute delivery goal.">
   <meta property="og:image" content="assets/images/hero.webp">
 
-  <!-- Favicon -->
+  <!-- Favicon (unchanged) -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="apple-touch-icon" href="favicon.svg">
 
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <!-- Performance: Preload hero image and Google Fonts -->
+  <link rel="preload" as="image" href="assets/images/hero.webp" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Ambient Animated Background -->
-  <div class="bg-ambient" aria-hidden="true">
-    <div class="bg-grid"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+  <!-- ====================================================================
+       PRELOADER (Signature Moment 1: Logo Reveal + Percentage Counter)
+       ==================================================================== -->
+  <div id="preloader" class="preloader" aria-hidden="true">
+    <div class="preloader-inner">
+      <div class="preloader-logo-badge">
+        <img src="assets/images/logo.jpg" alt="LezzFlow Logo Mark" width="64" height="64" class="preloader-logo-img">
+      </div>
+      <div class="preloader-brand">lezzflow<span class="brand-dot">.</span></div>
+      <div class="preloader-track">
+        <div class="preloader-fill" id="preloader-fill"></div>
+      </div>
+      <div class="preloader-status-row">
+        <span class="preloader-status-text">INITIALIZING PROTOCOL</span>
+        <span class="preloader-number" id="preloader-number">0%</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Interactive Canvas for Confetti -->
-  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+  <!-- Scroll Progress Indicator (Single rAF Transform Only) -->
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
 
-  <div class="site-wrapper">
+  <!-- Film Grain Noise Overlay (feTurbulence) -->
+  <div class="film-grain" aria-hidden="true"></div>
+
+  <!-- Ambient Light Orbs -->
+  <div class="ambient-glow" aria-hidden="true">
+    <div class="ambient-orb orb-top"></div>
+    <div class="ambient-orb orb-mid"></div>
+    <div class="ambient-orb orb-bottom"></div>
+  </div>
+
+  <!-- Single Interactive Cursor Glow (Desktop Only, Lerp rAF) -->
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+
+  <!-- High-Performance Confetti Canvas (Only Active on Submit) -->
+  <canvas id="confetti-canvas" class="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- Skip to Content Link for Keyboard Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="site-container">
 
     <!-- ====================================================================
          01. NAVBAR
          ==================================================================== -->
     <header class="navbar" id="navbar">
-      <div class="container nav-container">
-        <!-- Logo -->
-        <a href="#" class="brand" aria-label="lezzflow home">
-          <div class="brand-icon-box" aria-hidden="true">
-            <svg class="brand-logo-svg" viewBox="0 0 32 32" fill="none">
-              <path d="M9 7C9 5.89543 9.89543 5 11 5H14C15.1046 5 16 5.89543 16 7V20C16 20.5523 16.4477 21 17 21H23C24.1046 21 25 21.8954 25 23V25C25 26.1046 24.1046 27 23 27H11C9.89543 27 9 26.1046 9 25V7Z" fill="url(#navLogoGrad)"/>
-              <circle cx="25" cy="11" r="2.5" fill="#38bdf8"/>
-              <defs>
-                <linearGradient id="navLogoGrad" x1="9" y1="5" x2="26" y2="27" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#66a3ff"/>
-                  <stop offset="1" stop-color="#2f7bff"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <span class="brand-name">lezzflow<span class="brand-dot">.</span></span>
+      <div class="nav-shell">
+        <a href="#" class="nav-brand" aria-label="lezzflow home">
+          <span class="nav-logo-badge">
+            <img src="assets/images/logo.jpg" alt="LezzFlow Logo" width="34" height="34" class="nav-logo-img">
+          </span>
+          <span class="nav-brand-text">lezzflow<span class="brand-dot">.</span></span>
+          <span class="nav-pill-badge">PRE-LAUNCH</span>
         </a>
 
-        <!-- Desktop Navigation Links -->
-        <nav class="nav-links" aria-label="Main Navigation">
-          <a href="#how-it-works" class="nav-link">How it works</a>
-          <a href="#customers" class="nav-link">For Customers</a>
-          <a href="#sellers" class="nav-link">For Sellers</a>
-          <a href="#team" class="nav-link">Team</a>
+        <nav class="nav-links" id="desktop-nav" aria-label="Main Navigation">
+          <a href="#how-it-works" class="nav-anchor">How It Works</a>
+          <a href="#customers" class="nav-anchor">For Shoppers</a>
+          <a href="#sellers" class="nav-anchor">For Merchants</a>
+          <a href="#partners" class="nav-anchor">Delivery</a>
+          <a href="#stats" class="nav-anchor">Vision</a>
+          <a href="#team" class="nav-anchor">Team</a>
         </nav>
 
-        <!-- Navbar CTA -->
-        <div class="nav-cta-desktop">
-          <a href="#waitlist" class="btn btn-primary">
+        <div class="nav-actions">
+          <a href="#waitlist" class="btn btn-nav btn-magnetic">
             <span>Join Waitlist</span>
-            <svg class="btn-icon btn-icon-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="4" y1="10" x2="16" y2="10"/>
-              <polyline points="11 5 16 10 11 15"/>
+            <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4"/>
             </svg>
           </a>
+          <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-drawer">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+          </button>
         </div>
-
-        <!-- Mobile Hamburger Toggle -->
-        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-menu">
-          <span class="nav-toggle-bar"></span>
-          <span class="nav-toggle-bar"></span>
-          <span class="nav-toggle-bar"></span>
-        </button>
       </div>
 
       <!-- Mobile Navigation Drawer -->
-      <div class="mobile-menu" id="mobile-menu" aria-label="Mobile Navigation">
-        <a href="#how-it-works" class="mobile-link">How it works</a>
-        <a href="#customers" class="mobile-link">For Customers</a>
-        <a href="#sellers" class="mobile-link">For Sellers</a>
-        <a href="#team" class="mobile-link">Team</a>
-        <a href="#waitlist" class="btn btn-primary">
-          <span>Join Waitlist</span>
-          <svg class="btn-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="4" y1="10" x2="16" y2="10"/>
-            <polyline points="11 5 16 10 11 15"/>
-          </svg>
-        </a>
+      <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+        <div class="mobile-drawer-inner">
+          <div class="mobile-nav-links">
+            <a href="#how-it-works" class="mobile-nav-link">How It Works</a>
+            <a href="#customers" class="mobile-nav-link">For Shoppers</a>
+            <a href="#sellers" class="mobile-nav-link">For Merchants</a>
+            <a href="#partners" class="mobile-nav-link">Delivery Partners</a>
+            <a href="#stats" class="mobile-nav-link">Engineering Goals</a>
+            <a href="#team" class="mobile-nav-link">Team legezt</a>
+          </div>
+          <div class="mobile-drawer-footer">
+            <a href="#waitlist" class="btn btn-primary btn-block mobile-drawer-cta">
+              <span>Get Early Access</span>
+            </a>
+            <p class="mobile-drawer-note">Pre-launch beta • Smart India Hackathon 2026</p>
+          </div>
+        </div>
       </div>
     </header>
 
-    <!-- ====================================================================
-         02. HERO SECTION
-         ==================================================================== -->
-    <section class="hero" id="hero">
-      <div class="container hero-content">
-        <!-- Badge -->
-        <div class="hero-badge reveal-item">
-          <span class="hero-badge-tag">SIH 2026</span>
-          <span>Smart India Hackathon • Built by Team legezt</span>
-        </div>
+    <main id="main-content">
 
-        <!-- Headline -->
-        <h1 class="hero-title reveal-item delay-1">
-          Your neighbourhood, <span class="gradient-text">delivered in minutes.</span>
-        </h1>
-
-        <!-- Subtext -->
-        <p class="hero-subtitle reveal-item delay-2">
-          Connect with trusted nearby kirana shops, pharmacies, and daily essentials. Experience live store inventory, honest neighborhood prices, and swift doorstep delivery in under 15 minutes.
-        </p>
-
-        <!-- CTAs -->
-        <div class="hero-actions reveal-item delay-3">
-          <a href="#waitlist" class="btn btn-primary">
-            <span>Join Waitlist</span>
-            <svg class="btn-icon btn-icon-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="4" y1="10" x2="16" y2="10"/>
-              <polyline points="11 5 16 10 11 15"/>
-            </svg>
-          </a>
-          <a href="#sellers" class="btn btn-secondary">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-            <span>For Sellers</span>
-          </a>
-        </div>
-
-        <!-- Hero Visual Showcase with Floating Stat Chips -->
-        <div class="hero-showcase reveal-item delay-4">
-          <!-- Floating Stat Chip 1 -->
-          <div class="floating-chip chip-pos-1">
-            <div class="chip-icon-box" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-            </div>
-            <div class="chip-text">
-              <div class="chip-title">10-min avg delivery</div>
-              <div class="chip-subtitle">Hyperlocal routing</div>
-            </div>
-          </div>
-
-          <!-- Floating Stat Chip 2 -->
-          <div class="floating-chip chip-pos-2">
-            <div class="chip-icon-box" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
-              </svg>
-            </div>
-            <div class="chip-text">
-              <div class="chip-title">500+ local stores</div>
-              <div class="chip-subtitle">Verified merchants</div>
-            </div>
-          </div>
-
-          <!-- Floating Stat Chip 3 -->
-          <div class="floating-chip chip-pos-3">
-            <div class="chip-icon-box" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-            </div>
-            <div class="chip-text">
-              <div class="chip-title">100% Real-Time Stock</div>
-              <div class="chip-subtitle">Direct shelf sync</div>
-            </div>
-          </div>
-
-          <!-- Hero Main Visual -->
-          <div class="hero-frame">
-            <div class="hero-frame-inner">
-              <img src="assets/images/hero.webp" alt="LezzFlow Hyperlocal Commerce Platform App Visual" class="hero-img" onerror="handleImageFallback(this, 'hero')">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         03. LOGOS / TRUST STRIP (MARQUEE)
-         ==================================================================== -->
-    <section class="trust-strip" aria-label="Store Categories">
-      <div class="trust-title">Built for Local Commerce Across All Neighbourhood Needs</div>
-      <div class="marquee-container" tabindex="0" aria-label="Scrolling list of store categories">
-        <div class="marquee-track">
-          <!-- Item 1 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-            <span>Kirana &amp; General Stores</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 2 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-              <line x1="12" y1="8" x2="12" y2="14"/>
-              <line x1="9" y1="11" x2="15" y2="11"/>
-            </svg>
-            <span>Pharmacies &amp; Wellness</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 3 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 2a10 10 0 0 1 10 10c0 4-3 7-7 9H9c-4-2-7-5-7-9A10 10 0 0 1 12 2z"/>
-              <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-            </svg>
-            <span>Artisan Bakeries</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 4 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M8 2h8l2 6H6l2-6z"/>
-              <path d="M6 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"/>
-              <line x1="10" y1="12" x2="14" y2="12"/>
-            </svg>
-            <span>Dairy &amp; Fresh Milk</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 5 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
-            <span>Stationery &amp; Print</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 6 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 2L8 8h8l-4-6z"/>
-              <circle cx="12" cy="15" r="7"/>
-            </svg>
-            <span>Fresh Fruits &amp; Veggies</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 7 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-            <span>Organic Specialty</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 8 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <circle cx="9" cy="10" r="1.5"/>
-              <circle cx="15" cy="10" r="1.5"/>
-              <path d="M8 15s1.5 2 4 2 4-2 4-2"/>
-            </svg>
-            <span>Pet Care &amp; Nutrition</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- Item 9 -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            <span>Daily Essentials 24/7</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <!-- DUPLICATE SET FOR SEAMLESS LOOP -->
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-            <span>Kirana &amp; General Stores</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-              <line x1="12" y1="8" x2="12" y2="14"/>
-              <line x1="9" y1="11" x2="15" y2="11"/>
-            </svg>
-            <span>Pharmacies &amp; Wellness</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 2a10 10 0 0 1 10 10c0 4-3 7-7 9H9c-4-2-7-5-7-9A10 10 0 0 1 12 2z"/>
-              <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-            </svg>
-            <span>Artisan Bakeries</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M8 2h8l2 6H6l2-6z"/>
-              <path d="M6 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"/>
-              <line x1="10" y1="12" x2="14" y2="12"/>
-            </svg>
-            <span>Dairy &amp; Fresh Milk</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
-            <span>Stationery &amp; Print</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 2L8 8h8l-4-6z"/>
-              <circle cx="12" cy="15" r="7"/>
-            </svg>
-            <span>Fresh Fruits &amp; Veggies</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-            <span>Organic Specialty</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <circle cx="9" cy="10" r="1.5"/>
-              <circle cx="15" cy="10" r="1.5"/>
-              <path d="M8 15s1.5 2 4 2 4-2 4-2"/>
-            </svg>
-            <span>Pet Care &amp; Nutrition</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-
-          <div class="category-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            <span>Daily Essentials 24/7</span>
-          </div>
-          <div class="category-dot" aria-hidden="true"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         04. HOW IT WORKS SECTION
-         ==================================================================== -->
-    <section class="section" id="how-it-works">
-      <div class="container">
-        <div class="section-header">
-          <div class="section-tag">
-            <span class="section-tag-dot"></span>
-            <span>How It Works</span>
-          </div>
-          <h2 class="section-title">Hyperlocal commerce made effortless.</h2>
-          <p class="section-desc">
-            We bridge the gap between traditional corner shops and modern quick delivery through intelligent shelf sync and neighbourhood couriers.
-          </p>
-        </div>
-
-        <div class="steps-grid">
-          <!-- Step 1 -->
-          <article class="step-card reveal-item delay-1">
-            <div class="step-image-wrap">
-              <div class="step-num-badge">STEP 01</div>
-              <img src="assets/images/how-1.webp" alt="Discover nearby local stores on LezzFlow" class="step-image" onerror="handleImageFallback(this, 'how-1')">
-            </div>
-            <div class="step-body">
-              <h3 class="step-title">Discover nearby stores</h3>
-              <p class="step-desc">
-                Find neighborhood kiranas, pharmacies, and specialty retailers within a 2km radius. View live store status, distances, and real-time inventory before stepping out.
-              </p>
-              <div class="step-tags">
-                <span class="step-tag">2km Radius</span>
-                <span class="step-tag">Live Shop Status</span>
-                <span class="step-tag">Verified Sellers</span>
+      <!-- ====================================================================
+           02. HERO (Signature Moment 2: Staggered Mask Slide-Up & 3D Tilt Logo)
+           ==================================================================== -->
+      <section class="hero-section" id="hero" aria-label="Introduction">
+        <div class="hero-container">
+          
+          <div class="hero-header">
+            <div class="hero-eyebrow-wrapper reveal-item">
+              <div class="hero-pill">
+                <span class="pill-dot"></span>
+                <span class="pill-text">HYPERLOCAL COMMERCE PROTOCOL • PRE-LAUNCH</span>
               </div>
             </div>
-          </article>
 
-          <!-- Step 2 -->
-          <article class="step-card reveal-item delay-2">
-            <div class="step-image-wrap">
-              <div class="step-num-badge">STEP 02</div>
-              <img src="assets/images/how-2.webp" alt="Order in one tap from local store shelves" class="step-image" onerror="handleImageFallback(this, 'how-2')">
-            </div>
-            <div class="step-body">
-              <h3 class="step-title">Order in one tap</h3>
-              <p class="step-desc">
-                Browse accurate shelf stock with genuine local retail prices. Zero surge pricing, zero unexpected substitutions—just add your essentials and check out in seconds.
-              </p>
-              <div class="step-tags">
-                <span class="step-tag">Zero Price Surge</span>
-                <span class="step-tag">Real-Time Inventory</span>
-                <span class="step-tag">UPI &amp; Cards</span>
-              </div>
-            </div>
-          </article>
+            <h1 class="hero-headline" aria-label="Your neighbourhood, delivered in minutes.">
+              <span class="hero-mask-line">
+                <span class="hero-mask-inner">Your neighbourhood,</span>
+              </span>
+              <span class="hero-mask-line">
+                <span class="hero-mask-inner">delivered in <span class="gradient-text">minutes.</span></span>
+              </span>
+            </h1>
 
-          <!-- Step 3 -->
-          <article class="step-card reveal-item delay-3">
-            <div class="step-image-wrap">
-              <div class="step-num-badge">STEP 03</div>
-              <img src="assets/images/how-3.webp" alt="Doorstep delivery in minutes from local stores" class="step-image" onerror="handleImageFallback(this, 'how-3')">
-            </div>
-            <div class="step-body">
-              <h3 class="step-title">Doorstep delivery</h3>
-              <p class="step-desc">
-                Neighbourhood delivery partners pick up your order straight from the store counter and arrive at your doorstep in an average of 11 minutes with live GPS updates.
-              </p>
-              <div class="step-tags">
-                <span class="step-tag">11-Min Average</span>
-                <span class="step-tag">Live Map Tracking</span>
-                <span class="step-tag">Eco-Fleet Routes</span>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         05. FOR CUSTOMERS SECTION
-         ==================================================================== -->
-    <section class="section" id="customers">
-      <div class="container">
-        <div class="split-layout">
-          <!-- Text Column -->
-          <div class="split-content reveal-item">
-            <div class="section-tag">
-              <span class="section-tag-dot"></span>
-              <span>For Customers</span>
-            </div>
-            <h2 class="split-heading">
-              Everything your corner store has, <span class="gradient-text">without the wait.</span>
-            </h2>
-            <p class="split-description">
-              Stop guessing if the local shop has your favorite bread or medicine. LezzFlow brings your familiar neighborhood retailers right to your smartphone screen.
+            <p class="hero-subtext reveal-item delay-2">
+              LezzFlow connects local customers with verified neighbourhood kiranas, pharmacies, and corner stores. Real-time shelf inventory, authentic local pricing, and hyper-dense doorstep delivery.
             </p>
 
-            <div class="feature-list">
-              <!-- Benefit 1 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Live stock visibility</strong>
-                  <p>Know exactly what is on the shelf before placing your order. No out-of-stock cancellations or awkward replacements.</p>
-                </div>
-              </div>
-
-              <!-- Benefit 2 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="1" x2="12" y2="23"/>
-                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Real neighbourhood prices</strong>
-                  <p>Pay true MRP and local store discounts. No hidden platform markups, no artificial handling fees.</p>
-                </div>
-              </div>
-
-              <!-- Benefit 3 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polygon points="12 6 12 12 14 14"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Distance &amp; ETA shown upfront</strong>
-                  <p>Transparent shop radius, walking time, and live GPS courier tracking from checkout right to your hands.</p>
-                </div>
-              </div>
-
-              <!-- Benefit 4 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Fast sub-15 minute delivery</strong>
-                  <p>Because couriers pick up directly from your immediate block, orders reach you faster than giant centralized warehouses.</p>
-                </div>
-              </div>
-
-              <!-- Benefit 5 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Empower your neighbourhood economy</strong>
-                  <p>Every rupee you spend stays within your local community, supporting family-owned shops and local entrepreneurs.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Visual Column -->
-          <div class="split-visual reveal-item delay-2">
-            <div class="visual-mockup-frame">
-              <!-- Floating Callout Top Right -->
-              <div class="mockup-callout callout-top-right">
-                <div class="callout-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="callout-text">11 Min Delivery ETA</div>
-                  <div class="callout-sub">Gupta Kirana Store (0.6 km)</div>
-                </div>
-              </div>
-
-              <div class="visual-mockup-inner">
-                <img src="assets/images/customer-app.webp" alt="LezzFlow Customer Mobile App Interface" class="visual-mockup-img" onerror="handleImageFallback(this, 'customer-app')">
-              </div>
-
-              <!-- Floating Callout Bottom Left -->
-              <div class="mockup-callout callout-bottom-left">
-                <div class="callout-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="callout-text">Live Shelf Verified</div>
-                  <div class="callout-sub">Zero markups &bull; 100% genuine</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         06. FOR SELLERS SECTION
-         ==================================================================== -->
-    <section class="section" id="sellers">
-      <div class="container">
-        <div class="split-layout reverse">
-          <!-- Text Column -->
-          <div class="split-content reveal-item">
-            <div class="section-tag">
-              <span class="section-tag-dot"></span>
-              <span>For Sellers</span>
-            </div>
-            <h2 class="split-heading">
-              Turn your retail shop into a <span class="gradient-text">high-speed digital powerhouse.</span>
-            </h2>
-            <p class="split-description">
-              Empowering traditional shopkeepers and kirana owners with enterprise-grade tech. Zero tech headaches, zero hardware costs, and direct customer relationships.
-            </p>
-
-            <div class="feature-list">
-              <!-- Seller Feature 1 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Smart restock alerts</strong>
-                  <p>Predictive inventory notifications: <em>&ldquo;This item may run out before the weekend&rdquo;</em> so you never lose high-margin sales.</p>
-                </div>
-              </div>
-
-              <!-- Seller Feature 2 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"/>
-                    <line x1="12" y1="20" x2="12" y2="4"/>
-                    <line x1="6" y1="20" x2="6" y2="14"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Hyperlocal demand insights</strong>
-                  <p>See exactly what customers in your specific pin code are searching for and stock high-demand products ahead of the curve.</p>
-                </div>
-              </div>
-
-              <!-- Seller Feature 3 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                    <line x1="8" y1="21" x2="16" y2="21"/>
-                    <line x1="12" y1="17" x2="12" y2="21"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Zero-tech onboarding</strong>
-                  <p>Get your entire store online in 5 minutes using barcode scanning, voice search, or our ready-made regional catalog assistant.</p>
-                </div>
-              </div>
-
-              <!-- Seller Feature 4 -->
-              <div class="feature-item">
-                <div class="feature-icon-box" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                    <line x1="1" y1="10" x2="23" y2="10"/>
-                  </svg>
-                </div>
-                <div class="feature-text">
-                  <strong>Instant daily settlements</strong>
-                  <p>Zero holding periods. Every rupee earned settles directly into your UPI or bank account on the same day.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Visual Column -->
-          <div class="split-visual reveal-item delay-2">
-            <div class="visual-mockup-frame">
-              <div class="visual-mockup-inner">
-                <img src="assets/images/seller-app.webp" alt="LezzFlow Merchant Dashboard and Seller App" class="visual-mockup-img" onerror="handleImageFallback(this, 'seller-app')">
-              </div>
-
-              <!-- Floating Restock Alert Glow Card -->
-              <div class="alert-card-glow">
-                <div class="alert-card-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="alert-card-title">Restock Prediction Alert</div>
-                  <div class="alert-card-desc">Amul Taaza Milk 500ml may run out before Saturday evening &bull; Suggested order: 24 units</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         07. DELIVERY PARTNERS COMPACT STRIP
-         ==================================================================== -->
-    <section class="section" id="partners">
-      <div class="container">
-        <div class="delivery-strip-container reveal-item">
-          <div class="section-header" style="margin-bottom: 0;">
-            <div class="section-tag">
-              <span class="section-tag-dot"></span>
-              <span>Delivery Fleet</span>
-            </div>
-            <h2 class="section-title">Built for the neighbourhood hero.</h2>
-            <p class="section-desc">
-              Hyperlocal short-distance routes, transparent pay, and complete autonomy. Deliver within your familiar neighbourhood radius.
-            </p>
-          </div>
-
-          <div class="partner-grid">
-            <!-- Partner Item 1 -->
-            <div class="partner-card">
-              <div class="partner-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="1" x2="12" y2="23"/>
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            <div class="hero-cta-row reveal-item delay-3">
+              <a href="#waitlist" class="btn btn-primary btn-lg btn-magnetic">
+                <span>Join the Waitlist</span>
+                <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4"/>
                 </svg>
-              </div>
-              <h3 class="partner-title">Flexible Earnings</h3>
-              <p class="partner-desc">Guaranteed base payout per trip plus instant peak bonuses. Cash out anytime via direct UPI deposit.</p>
+              </a>
+              <a href="#sellers" class="btn btn-secondary btn-lg btn-magnetic">
+                <span>For Store Owners</span>
+                <svg class="btn-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 7l2-4h10l2 4M3 7v10h14V7M3 7h14"/>
+                  <path d="M8 11h4"/>
+                </svg>
+              </a>
             </div>
 
-            <!-- Partner Item 2 -->
-            <div class="partner-card">
-              <div class="partner-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-                </svg>
-              </div>
-              <h3 class="partner-title">Smart 2km Routes</h3>
-              <p class="partner-desc">No exhausting long-distance highway hauls. Deliver exclusively within a 2-3km hyper-local radius.</p>
-            </div>
-
-            <!-- Partner Item 3 -->
-            <div class="partner-card">
-              <div class="partner-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                </svg>
-              </div>
-              <h3 class="partner-title">Optimized Batching</h3>
-              <p class="partner-desc">Pick up paired orders from neighboring shops along your route to maximize earnings per kilometer.</p>
-            </div>
-
-            <!-- Partner Item 4 -->
-            <div class="partner-card">
-              <div class="partner-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-              </div>
-              <h3 class="partner-title">Safety &amp; Coverage</h3>
-              <p class="partner-desc">Comprehensive rider accidental medical insurance and 24/7 priority partner emergency dispatch.</p>
+            <div class="hero-honest-notice reveal-item delay-4">
+              <span class="notice-icon" aria-hidden="true">⚡</span>
+              <span>LezzFlow is currently in pre-launch — join the waitlist for early access.</span>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- ====================================================================
-         08. STATS BAND
-         ==================================================================== -->
-    <section class="stats-band" id="stats" aria-label="Key Platform Metrics">
-      <div class="container">
-        <div class="stats-grid">
-          <!-- Metric 1 -->
-          <div class="stat-item reveal-item delay-1">
-            <div class="stat-number" data-count="500" data-suffix="+">0</div>
-            <div class="stat-label">Local Stores</div>
-            <div class="stat-sublabel">Verified &amp; Active</div>
-          </div>
-
-          <!-- Metric 2 -->
-          <div class="stat-item reveal-item delay-2">
-            <div class="stat-number" data-count="25000" data-suffix="+">0</div>
-            <div class="stat-label">Orders Completed</div>
-            <div class="stat-sublabel">Neighbourhood Fulfillments</div>
-          </div>
-
-          <!-- Metric 3 -->
-          <div class="stat-item reveal-item delay-3">
-            <div class="stat-number" data-count="11" data-suffix=" min">0</div>
-            <div class="stat-label">Avg Delivery Time</div>
-            <div class="stat-sublabel">Order to Doorstep</div>
-          </div>
-
-          <!-- Metric 4 -->
-          <div class="stat-item reveal-item delay-4">
-            <div class="stat-number" data-count="4.9" data-decimals="1" data-suffix=" / 5">0</div>
-            <div class="stat-label">Customer Rating</div>
-            <div class="stat-sublabel">Verified Reviews</div>
-          </div>
-
-          <!-- Metric 5 -->
-          <div class="stat-item reveal-item delay-5">
-            <div class="stat-number" data-count="18" data-suffix="+">0</div>
-            <div class="stat-label">Pin Codes</div>
-            <div class="stat-sublabel">Rapidly Expanding</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         09. WAITLIST SECTION
-         ==================================================================== -->
-    <section class="section waitlist-section" id="waitlist">
-      <div class="container">
-        <div class="waitlist-box reveal-item">
-          <div class="section-tag">
-            <span class="section-tag-dot"></span>
-            <span>Early Access</span>
-          </div>
-
-          <h2 class="section-title">
-            Be the first to experience <span class="gradient-text">lezzflow.</span>
-          </h2>
-          <p class="section-desc" style="margin-bottom: 2rem;">
-            We are rolling out neighborhood by neighborhood across key metro clusters. Reserve your priority spot on the waitlist today.
-          </p>
-
-          <!-- Interactive Role Selector -->
-          <div class="role-tabs" role="tablist" aria-label="Select your role">
-            <button class="role-tab active" data-role="Customer" role="tab" aria-selected="true">I'm a Customer</button>
-            <button class="role-tab" data-role="Store Owner" role="tab" aria-selected="false">I'm a Store Owner</button>
-            <button class="role-tab" data-role="Delivery Partner" role="tab" aria-selected="false">I'm a Delivery Partner</button>
-          </div>
-
-          <!-- Waitlist Form -->
-          <form class="waitlist-form" id="waitlist-form">
-            <input type="hidden" id="waitlist-role" value="Customer">
-
-            <div class="form-row">
-              <div class="input-wrapper">
-                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
-                </svg>
-                <input 
-                  type="email" 
-                  id="waitlist-email" 
-                  class="waitlist-input" 
-                  placeholder="Enter your email address..." 
-                  required 
-                  aria-label="Email address for waitlist"
-                  autocomplete="email"
+          <!-- Hero Visual with 3D Floating Logo Mark -->
+          <div class="hero-visual-wrapper reveal-item delay-3">
+            <div class="hero-media-card" id="hero-media-card">
+              <div class="hero-image-frame">
+                <img 
+                  src="assets/images/hero.webp" 
+                  alt="LezzFlow Hyperlocal Commerce Experience Visual" 
+                  width="1920" 
+                  height="1280" 
+                  class="hero-media-img"
+                  fetchpriority="high"
                 >
+                <div class="hero-image-vignette" aria-hidden="true"></div>
               </div>
 
-              <button type="submit" class="btn btn-primary" id="waitlist-submit-btn">
-                <span>Get Early Access</span>
-                <svg class="btn-icon btn-icon-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <line x1="4" y1="10" x2="16" y2="10"/>
-                  <polyline points="11 5 16 10 11 15"/>
+              <!-- Real 3D Logo Badge with Parallax Tilt (Desktop Only) -->
+              <div class="hero-floating-emblem" id="hero-emblem" aria-hidden="true">
+                <div class="hero-emblem-badge">
+                  <img src="assets/images/logo.jpg" alt="LezzFlow 3D emblem mark" width="88" height="88" class="hero-emblem-img">
+                </div>
+                <div class="hero-emblem-info">
+                  <div class="hero-emblem-title">lezzflow<span class="brand-dot">.</span></div>
+                  <div class="hero-emblem-badge-pill">PRE-LAUNCH BETA</div>
+                </div>
+              </div>
+
+              <!-- Micro Floating Badge: Real-time Shelf Sync -->
+              <div class="hero-spec-chip chip-left" aria-hidden="true">
+                <div class="spec-chip-dot"></div>
+                <div class="spec-chip-content">
+                  <span class="spec-chip-label">REAL-TIME SHELF STOCK</span>
+                  <span class="spec-chip-val">Zero Out-of-Stock Surprises</span>
+                </div>
+              </div>
+
+              <!-- Micro Floating Badge: Target Speed -->
+              <div class="hero-spec-chip chip-right" aria-hidden="true">
+                <div class="spec-chip-icon">✦</div>
+                <div class="spec-chip-content">
+                  <span class="spec-chip-label">BUILT FOR TARGET</span>
+                  <span class="spec-chip-val">10-Minute Neighbourhood Runs</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Hero Scroll Down Indicator -->
+          <div class="hero-scroll-indicator reveal-item delay-4" aria-hidden="true">
+            <a href="#how-it-works" class="scroll-hint-link" tabindex="-1">
+              <span class="scroll-hint-track">
+                <span class="scroll-hint-pip"></span>
+              </span>
+              <span class="scroll-hint-label">EXPLORE ARCHITECTURE</span>
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           03. MARQUEE DIVIDER 1 (Store Categories)
+           ==================================================================== -->
+      <section class="marquee-strip" aria-label="Local Store Categories">
+        <div class="marquee-track">
+          <div class="marquee-group">
+            <span>KIRANA & PROVISIONS</span>
+            <span class="marquee-bullet">✦</span>
+            <span>SPECIALTY PHARMACY</span>
+            <span class="marquee-bullet">✦</span>
+            <span>ARTISAN BAKERY</span>
+            <span class="marquee-bullet">✦</span>
+            <span>FRESH HARVEST</span>
+            <span class="marquee-bullet">✦</span>
+            <span>LOCAL DAIRY & POULTRY</span>
+            <span class="marquee-bullet">✦</span>
+            <span>STATIONERY & BOOKS</span>
+            <span class="marquee-bullet">✦</span>
+            <span>PET CARE SUPPLIES</span>
+            <span class="marquee-bullet">✦</span>
+            <span>NEIGHBOURHOOD SPECIALTIES</span>
+            <span class="marquee-bullet">✦</span>
+          </div>
+          <div class="marquee-group" aria-hidden="true">
+            <span>KIRANA & PROVISIONS</span>
+            <span class="marquee-bullet">✦</span>
+            <span>SPECIALTY PHARMACY</span>
+            <span class="marquee-bullet">✦</span>
+            <span>ARTISAN BAKERY</span>
+            <span class="marquee-bullet">✦</span>
+            <span>FRESH HARVEST</span>
+            <span class="marquee-bullet">✦</span>
+            <span>LOCAL DAIRY & POULTRY</span>
+            <span class="marquee-bullet">✦</span>
+            <span>STATIONERY & BOOKS</span>
+            <span class="marquee-bullet">✦</span>
+            <span>PET CARE SUPPLIES</span>
+            <span class="marquee-bullet">✦</span>
+            <span>NEIGHBOURHOOD SPECIALTIES</span>
+            <span class="marquee-bullet">✦</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           04. HOW IT WORKS (Signature Moment 4: Sticky Stacking Cards 01-03)
+           ==================================================================== -->
+      <section class="section how-section section-below-fold" id="how-it-works" aria-labelledby="how-heading">
+        <div class="section-container">
+
+          <div class="section-header reveal-item">
+            <p class="section-eyebrow">01 / ARCHITECTURE</p>
+            <h2 class="section-title" id="how-heading">How LezzFlow connects your street.</h2>
+            <p class="section-subtitle">
+              Three streamlined, transform-only engineering layers bridging local corner stores directly to your hands.
+            </p>
+          </div>
+
+          <!-- Sticky Stacking Cards Deck -->
+          <div class="stacking-deck" id="stacking-deck">
+
+            <!-- Card 01 -->
+            <article class="stack-card reveal-item" data-index="0">
+              <div class="stack-card-grid">
+                <div class="stack-card-info">
+                  <div class="stack-card-meta">
+                    <span class="stack-number">01</span>
+                    <span class="stack-pill">LOCAL RADAR</span>
+                  </div>
+                  <h3 class="stack-title">Discover verified nearby stores</h3>
+                  <p class="stack-desc">
+                    Scan your immediate neighbourhood perimeter for verified kirana, pharmacies, and specialty retailers. Browse digital shelves synced directly with store inventory.
+                  </p>
+                  <ul class="stack-features" aria-label="Step 1 Key Highlights">
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Sub-2.5km local radius scan</span>
+                    </li>
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Real-time shelf stock confirmation</span>
+                    </li>
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Zero artificial platform markup</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="stack-card-visual">
+                  <div class="stack-image-frame">
+                    <img 
+                      src="assets/images/how-1.webp" 
+                      alt="Discover verified local stores interface preview" 
+                      width="1920" 
+                      height="1280" 
+                      loading="lazy" 
+                      decoding="async" 
+                      class="stack-media-img"
+                    >
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Card 02 -->
+            <article class="stack-card reveal-item" data-index="1">
+              <div class="stack-card-grid">
+                <div class="stack-card-info">
+                  <div class="stack-card-meta">
+                    <span class="stack-number">02</span>
+                    <span class="stack-pill">DIRECT DISPATCH</span>
+                  </div>
+                  <h3 class="stack-title">Order directly from the shopkeeper</h3>
+                  <p class="stack-desc">
+                    Place your basket in one tap. Your order routes instantly to the merchant’s terminal, where it is hand-picked and verified by the merchant who knows the products best.
+                  </p>
+                  <ul class="stack-features" aria-label="Step 2 Key Highlights">
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Instant merchant screen notification</span>
+                    </li>
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Digital substitutions with customer approval</span>
+                    </li>
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Secure escrow payment flow</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="stack-card-visual">
+                  <div class="stack-image-frame">
+                    <img 
+                      src="assets/images/how-2.webp" 
+                      alt="One-tap order routing preview" 
+                      width="1920" 
+                      height="1280" 
+                      loading="lazy" 
+                      decoding="async" 
+                      class="stack-media-img"
+                    >
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Card 03 -->
+            <article class="stack-card reveal-item" data-index="2">
+              <div class="stack-card-grid">
+                <div class="stack-card-info">
+                  <div class="stack-card-meta">
+                    <span class="stack-number">03</span>
+                    <span class="stack-pill">HYPERLOCAL TRANSIT</span>
+                  </div>
+                  <h3 class="stack-title">Doorstep arrival in minutes</h3>
+                  <p class="stack-desc">
+                    A dedicated neighbourhood courier collects your order straight from the shop counter and delivers it directly to your door without warehousing or middle-mile delays.
+                  </p>
+                  <ul class="stack-features" aria-label="Step 3 Key Highlights">
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Built for 10-minute neighbourhood delivery</span>
+                    </li>
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Point-to-point direct dispatch routes</span>
+                    </li>
+                    <li>
+                      <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                      <span>Zero dark stores, supporting real communities</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="stack-card-visual">
+                  <div class="stack-image-frame">
+                    <img 
+                      src="assets/images/how-3.webp" 
+                      alt="Doorstep delivery preview" 
+                      width="1920" 
+                      height="1280" 
+                      loading="lazy" 
+                      decoding="async" 
+                      class="stack-media-img"
+                    >
+                  </div>
+                </div>
+              </div>
+            </article>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           05. FOR CUSTOMERS (Signature Moment 6: 3D Tilt Card)
+           ==================================================================== -->
+      <section class="section section-split section-below-fold" id="customers" aria-labelledby="customers-heading">
+        <div class="section-container">
+          <div class="split-layout">
+            
+            <div class="split-content reveal-item">
+              <p class="section-eyebrow">FOR SHOPPERS</p>
+              <h2 class="section-title" id="customers-heading">Your neighbourhood stores, now one tap away.</h2>
+              <p class="section-subtitle">
+                Experience instant commerce with the warmth and trust of your local shopkeepers.
+              </p>
+
+              <div class="benefit-list">
+                <div class="benefit-item">
+                  <div class="benefit-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9M14 17H5M14 12H5M20 12h-2M9 7H5"/><circle cx="17" cy="17" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="12" r="3"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="benefit-heading">Real-time shelf stock</h3>
+                    <p class="benefit-copy">See what is actually on the shelf before you order. Eliminates frustrating cancellations and missing items.</p>
+                  </div>
+                </div>
+
+                <div class="benefit-item">
+                  <div class="benefit-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="benefit-heading">Transparent street pricing</h3>
+                    <p class="benefit-copy">Fair, honest prices direct from store owners. No inflated product markups or opaque surge fees.</p>
+                  </div>
+                </div>
+
+                <div class="benefit-item">
+                  <div class="benefit-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="benefit-heading">Built for 10-minute delivery</h3>
+                    <p class="benefit-copy">Because items travel from your own street corner rather than distant warehouses, transit times are measured in minutes.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="split-cta-row">
+                <a href="#waitlist" class="btn btn-primary btn-magnetic">
+                  <span>Join Customer Waitlist</span>
+                  <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- 3D Tilt Card (Desktop only) -->
+            <div class="split-visual reveal-item delay-2">
+              <div class="tilt-showcase-card" data-tilt>
+                <div class="tilt-glare" aria-hidden="true"></div>
+                <div class="tilt-card-inner">
+                  <div class="device-pill-header">
+                    <span class="device-dot"></span>
+                    <span class="device-tag">CUSTOMER APPLICATION PREVIEW</span>
+                  </div>
+                  <img 
+                    src="assets/images/customer-app.webp" 
+                    alt="LezzFlow Customer Mobile App Interface" 
+                    width="1920" 
+                    height="1280" 
+                    loading="lazy" 
+                    decoding="async" 
+                    class="tilt-image"
+                  >
+                  <div class="tilt-caption">
+                    <span class="caption-lead">Live Local Feed:</span>
+                    <span class="caption-text">Instant store distance, shelf availability, and checkout.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           06. FOR SELLERS (Signature Moment 6: 3D Tilt Card)
+           ==================================================================== -->
+      <section class="section section-split section-below-fold" id="sellers" aria-labelledby="sellers-heading">
+        <div class="section-container">
+          <div class="split-layout split-reverse">
+
+            <div class="split-content reveal-item">
+              <p class="section-eyebrow">FOR MERCHANTS</p>
+              <h2 class="section-title" id="sellers-heading">Turn your corner shop into a digital powerhouse.</h2>
+              <p class="section-subtitle">
+                Compete with mega quick-commerce giants without sacrificing independence or margins.
+              </p>
+
+              <div class="benefit-list">
+                <div class="benefit-item">
+                  <div class="benefit-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="benefit-heading">Zero-tech catalog onboarding</h3>
+                    <p class="benefit-copy">List your entire shop in minutes using AI barcode scanning and pre-mapped item databases. No technical skills required.</p>
+                  </div>
+                </div>
+
+                <div class="benefit-item">
+                  <div class="benefit-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="benefit-heading">Predictive restock signals</h3>
+                    <p class="benefit-copy">Receive proactive notifications before high-demand weekend staples run out, keeping shelves optimized.</p>
+                  </div>
+                </div>
+
+                <div class="benefit-item">
+                  <div class="benefit-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="benefit-heading">Fair economics & fast settlement</h3>
+                    <p class="benefit-copy">Zero commission gouging during pre-launch rollout. Direct daily settlements straight to your UPI account.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="split-cta-row">
+                <a href="#waitlist" class="btn btn-primary btn-magnetic">
+                  <span>Register Store on Waitlist</span>
+                  <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- 3D Tilt Card (Desktop only) -->
+            <div class="split-visual reveal-item delay-2">
+              <div class="tilt-showcase-card" data-tilt>
+                <div class="tilt-glare" aria-hidden="true"></div>
+                <div class="tilt-card-inner">
+                  <div class="device-pill-header">
+                    <span class="device-dot"></span>
+                    <span class="device-tag">MERCHANT COMMAND CENTER PREVIEW</span>
+                  </div>
+                  <img 
+                    src="assets/images/seller-app.webp" 
+                    alt="LezzFlow Merchant Terminal Interface" 
+                    width="1920" 
+                    height="1280" 
+                    loading="lazy" 
+                    decoding="async" 
+                    class="tilt-image"
+                  >
+                  <div class="tilt-caption">
+                    <span class="caption-lead">Merchant Terminal:</span>
+                    <span class="caption-text">One-touch inventory toggle, instant alerts & restock forecast.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           07. DELIVERY PARTNERS STRIP
+           ==================================================================== -->
+      <section class="section partners-section section-below-fold" id="partners" aria-labelledby="partners-heading">
+        <div class="section-container">
+
+          <div class="partners-banner reveal-item">
+            <div class="partners-header">
+              <p class="section-eyebrow">HYPERLOCAL FLEET</p>
+              <h2 class="section-title" id="partners-heading">Built for neighbourhood delivery runners.</h2>
+              <p class="section-subtitle">
+                Flexible earning opportunities designed around dense local zones instead of exhausting cross-city travel.
+              </p>
+            </div>
+
+            <div class="partners-grid">
+              <div class="partner-card">
+                <div class="partner-card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 9.17l4.24-4.24M14.83 14.83l4.24 4.24M9.17 14.83l-4.24 4.24"/></svg>
+                </div>
+                <h3 class="partner-card-title">Short micro-runs</h3>
+                <p class="partner-card-copy">Deliver within your own neighborhood cluster. Maximum 2.5km distance per trip, avoiding highway fatigue.</p>
+              </div>
+
+              <div class="partner-card">
+                <div class="partner-card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <h3 class="partner-card-title">Direct trip earnings</h3>
+                <p class="partner-card-copy">Transparent compensation per completed local run, with earnings settled directly without hidden platform deductions.</p>
+              </div>
+
+              <div class="partner-card">
+                <div class="partner-card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+                </div>
+                <h3 class="partner-card-title">Flexible schedules</h3>
+                <p class="partner-card-copy">Log in whenever you are available between studies, work, or free hours. Complete control over your time.</p>
+              </div>
+            </div>
+
+            <div class="partners-action-row">
+              <a href="#waitlist" class="btn btn-secondary btn-magnetic">
+                <span>Apply as Delivery Partner</span>
+                <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           08. STATS BAND (Signature Moment 5: Horizontal Animated Counters)
+               STRICT HONESTY: Target numbers & architecture specs only.
+               Zero fake user counts or fake ratings.
+           ==================================================================== -->
+      <section class="section stats-band-section section-below-fold" id="stats" aria-labelledby="stats-heading">
+        <div class="section-container">
+
+          <div class="stats-band-box reveal-item">
+            <div class="stats-band-header">
+              <p class="section-eyebrow">OUR VISION & ARCHITECTURE TARGETS</p>
+              <h2 class="section-title" id="stats-heading">Engineering metrics designed for local speed.</h2>
+              <p class="stats-honest-badge">
+                <span class="pulse-dot"></span>
+                <span>LezzFlow is currently in pre-launch — join the waitlist for early access.</span>
+              </p>
+            </div>
+
+            <div class="stats-counters-grid">
+              
+              <!-- Metric 1: Target Speed -->
+              <div class="stat-counter-block">
+                <div class="stat-value-wrap">
+                  <span class="stat-number" data-target="10" data-suffix=" min" data-prefix="" data-decimals="0">0 min</span>
+                </div>
+                <div class="stat-label">Target Delivery Window</div>
+                <p class="stat-subtext">Built for sub-10-minute direct neighbourhood transit.</p>
+              </div>
+
+              <!-- Metric 2: Shelf Stock Verification -->
+              <div class="stat-counter-block">
+                <div class="stat-value-wrap">
+                  <span class="stat-number" data-target="100" data-suffix="%" data-prefix="" data-decimals="0">0%</span>
+                </div>
+                <div class="stat-label">Shelf Stock Verification</div>
+                <p class="stat-subtext">Direct merchant sync to eliminate phantom inventory.</p>
+              </div>
+
+              <!-- Metric 3: Zero Commission Beta -->
+              <div class="stat-counter-block">
+                <div class="stat-value-wrap">
+                  <span class="stat-number" data-target="0" data-suffix="%" data-prefix="" data-decimals="0">0%</span>
+                </div>
+                <div class="stat-label">Beta Merchant Markup</div>
+                <p class="stat-subtext">Zero platform commission during initial pre-launch rollout.</p>
+              </div>
+
+              <!-- Metric 4: Hyperlocal Radius -->
+              <div class="stat-counter-block">
+                <div class="stat-value-wrap">
+                  <span class="stat-number" data-target="2.5" data-suffix=" km" data-prefix="" data-decimals="1">0.0 km</span>
+                </div>
+                <div class="stat-label">Hyperlocal Radius Target</div>
+                <p class="stat-subtext">Dense neighbourhood cluster radius for instant transit.</p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           09. MARQUEE DIVIDER 2 (Waitlist Ticker)
+           ==================================================================== -->
+      <section class="marquee-strip marquee-subtle" aria-label="Pre-Launch Marquee">
+        <div class="marquee-track">
+          <div class="marquee-group">
+            <span>EARLY ACCESS PRE-LAUNCH</span>
+            <span class="marquee-bullet">✦</span>
+            <span>SMART INDIA HACKATHON 2026</span>
+            <span class="marquee-bullet">✦</span>
+            <span>HYPERLOCAL COMMERCE ENGINE</span>
+            <span class="marquee-bullet">✦</span>
+            <span>SUPPORT YOUR LOCAL STORES</span>
+            <span class="marquee-bullet">✦</span>
+            <span>ZERO DARK STORES</span>
+            <span class="marquee-bullet">✦</span>
+            <span>TEAM LEGEZT INNOVATION</span>
+            <span class="marquee-bullet">✦</span>
+          </div>
+          <div class="marquee-group" aria-hidden="true">
+            <span>EARLY ACCESS PRE-LAUNCH</span>
+            <span class="marquee-bullet">✦</span>
+            <span>SMART INDIA HACKATHON 2026</span>
+            <span class="marquee-bullet">✦</span>
+            <span>HYPERLOCAL COMMERCE ENGINE</span>
+            <span class="marquee-bullet">✦</span>
+            <span>SUPPORT YOUR LOCAL STORES</span>
+            <span class="marquee-bullet">✦</span>
+            <span>ZERO DARK STORES</span>
+            <span class="marquee-bullet">✦</span>
+            <span>TEAM LEGEZT INNOVATION</span>
+            <span class="marquee-bullet">✦</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           10. WAITLIST (Signature Moment 7: Pills + Success State + Confetti)
+           ==================================================================== -->
+      <section class="section waitlist-section section-below-fold" id="waitlist" aria-labelledby="waitlist-heading">
+        <div class="section-container">
+
+          <div class="waitlist-card reveal-item">
+            <div class="waitlist-header">
+              <div class="waitlist-badge">
+                <span class="pulse-dot"></span>
+                <span>Priority Access</span>
+              </div>
+              <h2 class="section-title" id="waitlist-heading">Be the first to experience <span class="gradient-text">lezzflow.</span></h2>
+              <p class="waitlist-copy">
+                We are onboarding local merchants and clusters city by city. Reserve your priority spot on the waitlist today.
+              </p>
+              <p class="waitlist-honest-note">
+                LezzFlow is currently in pre-launch — join the waitlist for early access.
+              </p>
+            </div>
+
+            <!-- Waitlist Interactive Form -->
+            <form class="waitlist-form" id="waitlist-form" novalidate>
+              
+              <!-- Role Toggle Pills -->
+              <div class="role-selector-wrap" role="group" aria-label="Select your role">
+                <button type="button" class="role-pill active" data-role="Customer" aria-pressed="true">
+                  <span>Shopper</span>
+                </button>
+                <button type="button" class="role-pill" data-role="Store Owner" aria-pressed="false">
+                  <span>Store Owner</span>
+                </button>
+                <button type="button" class="role-pill" data-role="Delivery Partner" aria-pressed="false">
+                  <span>Delivery Runner</span>
+                </button>
+              </div>
+              <input type="hidden" id="waitlist-role-input" name="role" value="Customer">
+
+              <!-- Email Field + Submit Button -->
+              <div class="input-action-group">
+                <label for="waitlist-email-input" class="sr-only">Email address</label>
+                <div class="input-shell">
+                  <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                  </svg>
+                  <input 
+                    type="email" 
+                    id="waitlist-email-input" 
+                    name="email" 
+                    placeholder="Enter your email address" 
+                    required 
+                    autocomplete="email"
+                    class="waitlist-input"
+                  >
+                </div>
+                <button type="submit" class="btn btn-primary btn-submit btn-magnetic" id="waitlist-submit-btn">
+                  <span class="btn-text">Get Early Access</span>
+                  <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="form-feedback" id="form-feedback" role="alert" aria-live="polite"></div>
+            </form>
+
+            <!-- Success State Box -->
+            <div class="waitlist-success" id="waitlist-success" aria-hidden="true">
+              <div class="success-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
                 </svg>
+              </div>
+              <h3 class="success-title">You are on the priority list!</h3>
+              <p class="success-desc">
+                We have registered your invitation request. We will notify you the moment LezzFlow launches in your neighbourhood.
+              </p>
+              <div class="success-badge-row">
+                <span class="success-queue-chip" id="success-queue-chip">Queue Position: #3,492</span>
+                <span class="success-role-chip" id="success-role-chip">Shopper</span>
+              </div>
+              <button type="button" class="btn btn-secondary btn-reset" id="waitlist-reset-btn">
+                <span>Register another email</span>
               </button>
             </div>
 
-            <p class="waitlist-note">
-              No spam ever. You will receive an invitation as soon as <span>lezzflow.</span> launches in your area.
-            </p>
-          </form>
-
-          <!-- Waitlist Success State Card -->
-          <div class="waitlist-success" id="waitlist-success">
-            <div class="success-badge" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </div>
-            <h3 class="success-title">You're on the early access list!</h3>
-            <p class="success-desc">
-              Thank you for supporting hyperlocal commerce. We have reserved your priority access ticket and will notify you when lezzflow opens in your neighborhood.
-            </p>
-            <div class="queue-chip" id="queue-number">Queue Position: #3,482</div>
-            <button type="button" class="btn btn-secondary" id="waitlist-reset-btn" style="margin-top: 1.5rem; font-size: 0.85rem; padding: 0.5rem 1.2rem;">
-              Submit another email or role
-            </button>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- ====================================================================
-         10. TEAM SECTION (Team legezt - SIH 2026)
-         ==================================================================== -->
-    <section class="section" id="team">
-      <div class="container">
-        <div class="section-header">
-          <div class="section-tag">
-            <span class="section-tag-dot"></span>
-            <span>Team legezt</span>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           11. TEAM SECTION (Team legezt - SIH 2026)
+               STRICT HONESTY: Mohd Jibraan — Team Leader (only verified role).
+               All other members: Names only, NO invented roles/titles.
+           ==================================================================== -->
+      <section class="section team-section section-below-fold" id="team" aria-labelledby="team-heading">
+        <div class="section-container">
+
+          <div class="section-header reveal-item">
+            <p class="section-eyebrow">SMART INDIA HACKATHON 2026</p>
+            <h2 class="section-title" id="team-heading">Team legezt</h2>
+            <p class="section-subtitle">
+              Engineered by Team legezt for Smart India Hackathon (SIH) 2026 to empower local neighbourhood commerce.
+            </p>
           </div>
-          <h2 class="section-title">The creators behind lezzflow.</h2>
-          <p class="section-desc">
-            Created for Smart India Hackathon (SIH) 2026 to revitalize neighborhood stores through cutting-edge hyperlocal software engineering.
-          </p>
-        </div>
 
-        <div class="team-grid">
-          <!-- Member 1: Mohd Jibraan (Team Leader) -->
-          <article class="team-card team-lead reveal-item delay-1">
-            <div class="team-avatar" aria-label="Mohd Jibraan avatar">MJ</div>
-            <h3 class="team-name">Mohd Jibraan</h3>
-            <div class="team-role">Team Leader</div>
-            <p class="team-focus">Full Stack Architecture, system design, and core platform roadmap.</p>
-            <div class="team-socials" aria-label="Social profiles for Mohd Jibraan">
-              <a href="#" class="team-social-link" aria-label="GitHub profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                </svg>
-              </a>
-              <a href="#" class="team-social-link" aria-label="LinkedIn profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                  <rect x="2" y="9" width="4" height="12"/>
-                  <circle cx="4" cy="4" r="2"/>
-                </svg>
-              </a>
-            </div>
-          </article>
+          <div class="team-grid">
 
-          <!-- Member 2: Syed Salman Razvi -->
-          <article class="team-card reveal-item delay-2">
-            <div class="team-avatar" aria-label="Syed Salman Razvi avatar">SR</div>
-            <h3 class="team-name">Syed Salman Razvi</h3>
-            <div class="team-role">Core Backend</div>
-            <p class="team-focus">Distributed microservices, realtime pub/sub stock sync, and APIs.</p>
-            <div class="team-socials" aria-label="Social profiles for Syed Salman Razvi">
-              <a href="#" class="team-social-link" aria-label="GitHub profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                </svg>
-              </a>
-              <a href="#" class="team-social-link" aria-label="LinkedIn profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                  <rect x="2" y="9" width="4" height="12"/>
-                  <circle cx="4" cy="4" r="2"/>
-                </svg>
-              </a>
-            </div>
-          </article>
-
-          <!-- Member 3: Muskan Begum -->
-          <article class="team-card reveal-item delay-3">
-            <div class="team-avatar" aria-label="Muskan Begum avatar">MB</div>
-            <h3 class="team-name">Muskan Begum</h3>
-            <div class="team-role">UI/UX Design</div>
-            <p class="team-focus">Design systems, responsive interfaces, and human-centered design.</p>
-            <div class="team-socials" aria-label="Social profiles for Muskan Begum">
-              <a href="#" class="team-social-link" aria-label="GitHub profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                </svg>
-              </a>
-              <a href="#" class="team-social-link" aria-label="LinkedIn profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                  <rect x="2" y="9" width="4" height="12"/>
-                  <circle cx="4" cy="4" r="2"/>
-                </svg>
-              </a>
-            </div>
-          </article>
-
-          <!-- Member 4: Shaista Naaz -->
-          <article class="team-card reveal-item delay-4">
-            <div class="team-avatar" aria-label="Shaista Naaz avatar">SN</div>
-            <h3 class="team-name">Shaista Naaz</h3>
-            <div class="team-role">Logistics Strategy</div>
-            <p class="team-focus">Fleet dispatching algorithms, route optimization, and partner safety.</p>
-            <div class="team-socials" aria-label="Social profiles for Shaista Naaz">
-              <a href="#" class="team-social-link" aria-label="GitHub profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                </svg>
-              </a>
-              <a href="#" class="team-social-link" aria-label="LinkedIn profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                  <rect x="2" y="9" width="4" height="12"/>
-                  <circle cx="4" cy="4" r="2"/>
-                </svg>
-              </a>
-            </div>
-          </article>
-
-          <!-- Member 5: Abdul Rahman Mohd Ghouse -->
-          <article class="team-card reveal-item delay-5">
-            <div class="team-avatar" aria-label="Abdul Rahman Mohd Ghouse avatar">AG</div>
-            <h3 class="team-name">Abdul Rahman Mohd Ghouse</h3>
-            <div class="team-role">Merchant Solutions</div>
-            <p class="team-focus">Retail database engineering, zero-tech cataloging, and seller tools.</p>
-            <div class="team-socials" aria-label="Social profiles for Abdul Rahman Mohd Ghouse">
-              <a href="#" class="team-social-link" aria-label="GitHub profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                </svg>
-              </a>
-              <a href="#" class="team-social-link" aria-label="LinkedIn profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                  <rect x="2" y="9" width="4" height="12"/>
-                  <circle cx="4" cy="4" r="2"/>
-                </svg>
-              </a>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====================================================================
-         11. FOOTER
-         ==================================================================== -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-top">
-          <!-- Col 1: Brand Info -->
-          <div class="footer-brand">
-            <a href="#" class="brand" aria-label="lezzflow home">
-              <div class="brand-icon-box" aria-hidden="true">
-                <svg class="brand-logo-svg" viewBox="0 0 32 32" fill="none">
-                  <path d="M9 7C9 5.89543 9.89543 5 11 5H14C15.1046 5 16 5.89543 16 7V20C16 20.5523 16.4477 21 17 21H23C24.1046 21 25 21.8954 25 23V25C25 26.1046 24.1046 27 23 27H11C9.89543 27 9 26.1046 9 25V7Z" fill="url(#footerLogoGrad)"/>
-                  <circle cx="25" cy="11" r="2.5" fill="#38bdf8"/>
-                  <defs>
-                    <linearGradient id="footerLogoGrad" x1="9" y1="5" x2="26" y2="27" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#66a3ff"/>
-                      <stop offset="1" stop-color="#2f7bff"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
+            <!-- Member 1: Mohd Jibraan (Team Leader - Verified Role) -->
+            <article class="team-card team-card-lead reveal-item delay-1">
+              <div class="team-avatar-shell">
+                <span class="team-initials">MJ</span>
               </div>
-              <span class="brand-name">lezzflow<span class="brand-dot">.</span></span>
+              <div class="team-details">
+                <h3 class="team-name">Mohd Jibraan</h3>
+                <div class="team-role-tag">Team Leader</div>
+              </div>
+              <div class="team-card-glow" aria-hidden="true"></div>
+            </article>
+
+            <!-- Member 2: Syed Salman Razvi (Name only) -->
+            <article class="team-card reveal-item delay-2">
+              <div class="team-avatar-shell">
+                <span class="team-initials">SR</span>
+              </div>
+              <div class="team-details">
+                <h3 class="team-name">Syed Salman Razvi</h3>
+                <div class="team-member-tag">Team legezt</div>
+              </div>
+              <div class="team-card-glow" aria-hidden="true"></div>
+            </article>
+
+            <!-- Member 3: Muskan Begum (Name only) -->
+            <article class="team-card reveal-item delay-3">
+              <div class="team-avatar-shell">
+                <span class="team-initials">MB</span>
+              </div>
+              <div class="team-details">
+                <h3 class="team-name">Muskan Begum</h3>
+                <div class="team-member-tag">Team legezt</div>
+              </div>
+              <div class="team-card-glow" aria-hidden="true"></div>
+            </article>
+
+            <!-- Member 4: Shaista Naaz (Name only) -->
+            <article class="team-card reveal-item delay-4">
+              <div class="team-avatar-shell">
+                <span class="team-initials">SN</span>
+              </div>
+              <div class="team-details">
+                <h3 class="team-name">Shaista Naaz</h3>
+                <div class="team-member-tag">Team legezt</div>
+              </div>
+              <div class="team-card-glow" aria-hidden="true"></div>
+            </article>
+
+            <!-- Member 5: Abdul Rahman Mohd Ghouse (Name only) -->
+            <article class="team-card reveal-item delay-5">
+              <div class="team-avatar-shell">
+                <span class="team-initials">AG</span>
+              </div>
+              <div class="team-details">
+                <h3 class="team-name">Abdul Rahman Mohd Ghouse</h3>
+                <div class="team-member-tag">Team legezt</div>
+              </div>
+              <div class="team-card-glow" aria-hidden="true"></div>
+            </article>
+
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ====================================================================
+         12. FOOTER (Signature Moment 8: Big Wordmark, Huge Fluid Type)
+         ==================================================================== -->
+    <footer class="footer" id="footer" aria-label="Site Footer">
+      <div class="footer-container">
+
+        <!-- Top Footer Grid -->
+        <div class="footer-top-grid">
+          
+          <div class="footer-brand-col">
+            <a href="#" class="footer-brand" aria-label="lezzflow home">
+              <span class="footer-logo-badge">
+                <img src="assets/images/logo.jpg" alt="LezzFlow Logo" width="38" height="38" class="footer-logo-img">
+              </span>
+              <span class="footer-brand-text">lezzflow<span class="brand-dot">.</span></span>
             </a>
-            <p class="footer-tagline">
-              Your neighbourhood stores, now one tap away. Hyperlocal commerce platform engineered for genuine speed, fair prices, and community empowerment.
+            <p class="footer-bio">
+              Hyperlocal commerce platform connecting customers with verified nearby neighbourhood stores for direct, sub-10-minute delivery.
             </p>
-            <div class="footer-badge">
-              <span>Made by Team legezt for SIH 2026</span>
+            <div class="footer-status-pill">
+              <span class="pulse-dot"></span>
+              <span>Pre-Launch Beta • SIH 2026</span>
             </div>
           </div>
 
-          <!-- Col 2: Platform Links -->
-          <div>
-            <h4 class="footer-col-title">Platform</h4>
-            <ul class="footer-nav">
-              <li><a href="#how-it-works" class="footer-nav-link">How it works</a></li>
-              <li><a href="#customers" class="footer-nav-link">For Customers</a></li>
-              <li><a href="#sellers" class="footer-nav-link">For Sellers</a></li>
-              <li><a href="#partners" class="footer-nav-link">Delivery Partners</a></li>
-              <li><a href="#stats" class="footer-nav-link">Platform Metrics</a></li>
+          <div class="footer-links-col">
+            <div class="footer-col-heading">Architecture</div>
+            <ul class="footer-links-list">
+              <li><a href="#how-it-works">How It Works</a></li>
+              <li><a href="#customers">For Shoppers</a></li>
+              <li><a href="#sellers">For Merchants</a></li>
+              <li><a href="#partners">Delivery Fleet</a></li>
             </ul>
           </div>
 
-          <!-- Col 3: Company / Project -->
-          <div>
-            <h4 class="footer-col-title">Project</h4>
-            <ul class="footer-nav">
-              <li><a href="#team" class="footer-nav-link">Team legezt</a></li>
-              <li><a href="#waitlist" class="footer-nav-link">Join Waitlist</a></li>
-              <li><a href="#" class="footer-nav-link">SIH 2026 Pitch Deck</a></li>
-              <li><a href="#" class="footer-nav-link">Architecture Docs</a></li>
+          <div class="footer-links-col">
+            <div class="footer-col-heading">Project</div>
+            <ul class="footer-links-list">
+              <li><a href="#team">Team legezt</a></li>
+              <li><a href="#stats">Engineering Targets</a></li>
+              <li><a href="#waitlist">Priority Access</a></li>
+              <li><span class="footer-disabled-link">Smart India Hackathon 2026</span></li>
             </ul>
           </div>
 
-          <!-- Col 4: Operational Status -->
-          <div>
-            <h4 class="footer-col-title">Status</h4>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-              Currently in private pilot mode across select residential pin codes.
+          <div class="footer-links-col">
+            <div class="footer-col-heading">Honest Notice</div>
+            <p class="footer-notice-text">
+              LezzFlow is currently in pre-launch — join the waitlist for early access. No dark stores, no predatory commissions.
             </p>
-            <div class="system-status">
-              <span class="status-dot"></span>
-              <span>All Systems Operational &bull; SIH 2026</span>
-            </div>
           </div>
+
         </div>
 
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-          <div class="footer-copy">
-            &copy; 2026 <strong>lezzflow.</strong> All rights reserved. Developed by <strong>Team legezt</strong> for Smart India Hackathon 2026.
-          </div>
-          <a href="#hero" class="back-to-top" aria-label="Back to top of page">
+        <!-- Signature Moment 8: Giant "lezzflow." Fluid Type Wordmark -->
+        <div class="footer-monumental-wordmark" aria-hidden="true">
+          <span class="monumental-text">lezzflow<span class="brand-dot">.</span></span>
+        </div>
+
+        <!-- Bottom Footer Row -->
+        <div class="footer-bottom-row">
+          <p class="footer-copyright">
+            © 2026 lezzflow. Engineered with craft by Team legezt for Smart India Hackathon (SIH) 2026.
+          </p>
+          <button type="button" class="back-to-top-btn" id="back-to-top-btn" aria-label="Scroll back to top">
             <span>Back to top</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="12" y1="19" x2="12" y2="5"/>
-              <polyline points="5 12 12 5 19 12"/>
+            <svg class="arrow-up-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 13V3M3 8l5-5 5 5"/>
             </svg>
-          </a>
+          </button>
         </div>
+
       </div>
     </footer>
 
   </div>
 
-  <!-- Main JavaScript File -->
+  <!-- JavaScript Controller (Vanilla only, <20KB, strict performance) -->
   <script src="js/main.js"></script>
 </body>
 </html>
