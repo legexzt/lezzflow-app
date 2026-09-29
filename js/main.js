@@ -1,6 +1,24 @@
 /* ==========================================================================
-   lezzflow. — main.js
+   lezzflow. — main.js  (FIXED BUILD)
    Vanilla JS. Transform/opacity-only motion. IntersectionObserver-driven.
+   --------------------------------------------------------------------------
+   FIX LOG (class-name audit — every class JS toggles now has matching CSS):
+   • .reveal / [data-reveal] ......... 'is-visible' (was already 'is-visible';
+                                       CSS unified to .reveal.is-visible)
+   • body scroll lock ................ 'is-locked'  (was 'no-scroll' — had NO
+                                       matching CSS rule; drawer never locked
+                                       scroll. FIXED.)
+   • preloader ....................... 'is-done' → 'is-gone', body 'is-loaded'
+   • preloader wordmark letters ...... '.preloader__letter' spans w/ delays
+   • drawer / nav toggle ............. 'is-open' + aria-expanded sync
+   • nav scrolled state .............. 'is-scrolled'
+   • waitlist feedback ............... 'is-error' / 'is-ok' (now actually set)
+   • role pills ...................... 'is-active' + aria-pressed sync
+   • confetti canvas ................. 'is-active'
+   • cursor glow ..................... 'is-visible'
+   • back-to-top ..................... 'is-visible'
+   • lazy videos ..................... data-hydrated="true"
+   NEW: 2500ms reveal failsafe — force-reveals anything IO missed.
    ========================================================================== */
 (() => {
   'use strict';
@@ -14,6 +32,7 @@
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointerQuery  = window.matchMedia('(pointer: fine)');
   const DESKTOP_BP = 1024;
+  const NAV_BP = 900;
 
   const prefersReduced = () => reduceMotionQuery.matches;
   const pointerFX = () =>
@@ -24,52 +43,94 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const lerp  = (a, b, t) => a + (b - a) * t;
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+  // Deliberate, premium progress easing — quick start, long confident settle.
+  const easePreloader = (t) => (t < 0.55
+    ? 2.4 * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
   /* ------------------------------------------------------------------ *
-   * 1. Preloader — percentage counter + blue curtain lift
+   * 1. Preloader — orbiting badge, staggered wordmark, eased progress,
+   *    sequenced exit (inner rises → curtain lifts). Never traps anyone.
    * ------------------------------------------------------------------ */
   const preloader = $('#preloader');
 
   const finishPreloader = () => {
     if (!preloader || preloader.classList.contains('is-done')) return;
-    preloader.classList.add('is-done');
-    document.body.classList.add('is-loaded');
+    preloader.classList.add('is-done');           // CSS: inner fades, curtain lifts (delayed)
     preloader.setAttribute('aria-hidden', 'true');
+    document.body.classList.add('is-loaded');      // releases hero mask-lines
     window.setTimeout(() => {
-      preloader.classList.add('is-gone');
-    }, prefersReduced() ? 80 : 950);
+      preloader.classList.add('is-gone');          // CSS: display:none / visibility
+    }, prefersReduced() ? 120 : 1500);
   };
 
   if (preloader) {
     const countEl = $('#preloader-count');
     const fillEl  = $('#preloader-fill');
+    const wordEl  = $('.preloader__word', preloader);
 
-    if (prefersReduced()) {
-      if (countEl) countEl.textContent = '100%';
-      if (fillEl) fillEl.style.transform = 'scaleX(1)';
+    // Split wordmark into per-letter spans for the staggered rise-in.
+    if (wordEl) {
+      const text = (wordEl.textContent || '').trim() || 'lezzflow.';
+      wordEl.setAttribute('aria-label', text);
+      wordEl.textContent = '';
+      const frag = document.createDocumentFragment();
+      Array.from(text).forEach((ch, i) => {
+        const s = document.createElement('span');
+        s.className = 'preloader__letter' + (ch === '.' ? ' dot' : '');
+        s.textContent = ch;
+        s.setAttribute('aria-hidden', 'true');
+        s.style.transitionDelay = (0.35 + i * 0.055).toFixed(3) + 's';
+        frag.appendChild(s);
+      });
+      wordEl.appendChild(frag);
+    }
+
+    const setProgress = (eased) => {
+      if (countEl) countEl.textContent = Math.round(eased * 100) + '%';
+      if (fillEl) fillEl.style.transform = 'scaleX(' + eased + ')';
+    };
+
+    // FAILSAFE A — hard cap: never hold anyone past 4s, whatever happens.
+    const forceTimer = window.setTimeout(finishPreloader, 4000);
+    const safeFinish = () => {
+      window.clearTimeout(forceTimer);
+      setProgress(1);
       finishPreloader();
+    };
+
+    // FAILSAFE B — if window load already fired (cached page / late script),
+    // complete immediately instead of replaying the whole sequence.
+    if (document.readyState === 'complete') {
+      safeFinish();
+    } else if (prefersReduced()) {
+      setProgress(1);
+      window.setTimeout(safeFinish, 150);
     } else {
-      const DURATION = 1500;
+      const DURATION = 2250; // ~2.2s — deliberate, premium, not rushed
       let startTime = null;
       const step = (now) => {
         if (startTime === null) startTime = now;
         const raw = clamp((now - startTime) / DURATION, 0, 1);
-        const eased = easeOutCubic(raw);
-        if (countEl) countEl.textContent = Math.round(eased * 100) + '%';
-        if (fillEl) fillEl.style.transform = 'scaleX(' + eased + ')';
+        setProgress(easePreloader(raw));
         if (raw < 1) window.requestAnimationFrame(step);
-        else finishPreloader();
+        else safeFinish();
       };
       window.requestAnimationFrame(step);
-      // Safety net — never trap anyone behind the curtain.
-      window.setTimeout(finishPreloader, 4200);
+      // FAILSAFE C — if load stalls the rAF loop somehow, load event nudges us.
+      window.addEventListener('load', () => {
+        window.setTimeout(() => {
+          if (!preloader.classList.contains('is-done')) safeFinish();
+        }, 1200);
+      }, { once: true });
     }
   } else {
     document.body.classList.add('is-loaded');
   }
 
   /* ------------------------------------------------------------------ *
-   * 2. Mobile drawer — keyboard-operable, focus-managed
+   * 2. Mobile drawer — toggle, ESC, backdrop(outside) click, link click,
+   *    body scroll lock ('is-locked'), focus management + light trap.
    * ------------------------------------------------------------------ */
   const navToggle = $('#nav-toggle');
   const drawer = $('#mobile-drawer');
@@ -81,7 +142,7 @@
     navToggle.classList.add('is-open');
     navToggle.setAttribute('aria-expanded', 'true');
     navToggle.setAttribute('aria-label', 'Close navigation menu');
-    document.body.classList.add('no-scroll');
+    document.body.classList.add('is-locked');
     const firstLink = $('a, button', drawer);
     if (firstLink) firstLink.focus({ preventScroll: true });
   }
@@ -93,7 +154,7 @@
     navToggle.classList.remove('is-open');
     navToggle.setAttribute('aria-expanded', 'false');
     navToggle.setAttribute('aria-label', 'Open navigation menu');
-    document.body.classList.remove('no-scroll');
+    document.body.classList.remove('is-locked');
     if (returnFocus) navToggle.focus({ preventScroll: true });
   }
 
@@ -103,12 +164,22 @@
       else openDrawer();
     });
 
+    // Close on any drawer link click.
     $$('a', drawer).forEach((link) => {
       link.addEventListener('click', () => closeDrawer(false));
     });
 
+    // Close on ESC (global).
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeDrawer(true);
+    });
+
+    // Close on backdrop / outside click.
+    document.addEventListener('click', (e) => {
+      if (!drawer.classList.contains('is-open')) return;
+      const t = e.target;
+      if (!(t instanceof Node)) return;
+      if (!drawer.contains(t) && !navToggle.contains(t)) closeDrawer(false);
     });
 
     // Lightweight focus trap while the drawer is open.
@@ -126,6 +197,11 @@
         first.focus();
       }
     });
+
+    // Safety: resizing up to desktop must never leave the drawer stuck open.
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > NAV_BP) closeDrawer(false);
+    }, { passive: true });
   }
 
   /* ------------------------------------------------------------------ *
@@ -141,6 +217,8 @@
     maxScroll = Math.max(docEl.scrollHeight - window.innerHeight, 1);
   };
   measure();
+  window.addEventListener('resize', measure, { passive: true });
+  window.addEventListener('load', measure, { once: true });
 
   let scrollTicking = false;
   const onScroll = () => {
@@ -168,20 +246,30 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * 4. Scroll reveals — IntersectionObserver, CSS transitions do the rest
+   * 4. Scroll reveals — IntersectionObserver adds 'is-visible'.
+   *    FAILSAFE: after 2500ms force-reveal anything IO missed.
    * ------------------------------------------------------------------ */
   const revealEls = $$('.reveal, [data-reveal]');
+  const forceReveal = (el) => el.classList.add('is-visible');
+
   if (prefersReduced() || !('IntersectionObserver' in window)) {
-    revealEls.forEach((el) => el.classList.add('is-visible'));
+    revealEls.forEach(forceReveal);
   } else if (revealEls.length) {
     const revealIO = new IntersectionObserver((entries, io) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
+        forceReveal(entry.target);
         io.unobserve(entry.target);
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
     revealEls.forEach((el) => revealIO.observe(el));
+
+    // Failsafe — no element may ever stay invisible because IO misbehaved.
+    window.setTimeout(() => {
+      revealEls.forEach((el) => {
+        if (!el.classList.contains('is-visible')) forceReveal(el);
+      });
+    }, 2500);
   }
 
   /* ------------------------------------------------------------------ *
@@ -230,6 +318,16 @@
         });
       }, { threshold: 0.4 });
       counters.forEach((el) => countIO.observe(el));
+
+      // Failsafe for counters as well — never leave a "0" behind.
+      window.setTimeout(() => {
+        counters.forEach((el) => {
+          if (el.textContent === '0' || el.textContent === '0.0') {
+            const target = parseFloat(el.getAttribute('data-count'));
+            if (!Number.isNaN(target)) renderCounter(el, target);
+          }
+        });
+      }, 4000);
     }
   }
 
@@ -392,15 +490,7 @@
    * 8. Waitlist — role pills, validation, animated success + confetti
    * ------------------------------------------------------------------ */
   const waitlistForm = $('#waitlist-form');
-
-  const rolePills = $$('.role-pill, [data-role-pill]');
   const roleInput = $('#waitlist-role');
-  if (rolePills.length)if (rolePills.length) {
-    setupRolePills(rolePills);
-  } else {
-    // Actual markup uses button.role[data-role] — fall back to it.
-    setupRolePills($$('button.role[data-role]'));
-  }
 
   function setupRolePills(pills) {
     if (!pills.length || !roleInput) return;
@@ -418,6 +508,7 @@
       });
     });
   }
+  setupRolePills($$('button.role[data-role]'));
 
   if (waitlistForm) {
     const emailInput = $('#waitlist-email');
@@ -427,10 +518,17 @@
     const resetBtn = $('#waitlist-reset');
     const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    const setFeedback = (msg, kind) => {
+      if (!feedback) return;
+      feedback.textContent = msg;
+      feedback.classList.toggle('is-error', kind === 'error');
+      feedback.classList.toggle('is-ok', kind === 'ok');
+    };
+
     if (emailInput) {
       emailInput.addEventListener('input', () => {
         emailInput.removeAttribute('aria-invalid');
-        if (feedback) feedback.textContent = '';
+        setFeedback('', '');
       });
     }
 
@@ -439,7 +537,7 @@
       const email = emailInput ? emailInput.value.trim() : '';
 
       if (!emailInput || !EMAIL_RE.test(email)) {
-        if (feedback) feedback.textContent = 'Please enter a valid email address.';
+        setFeedback('Please enter a valid email address.', 'error');
         if (emailInput) {
           emailInput.setAttribute('aria-invalid', 'true');
           emailInput.focus({ preventScroll: true });
@@ -448,7 +546,7 @@
       }
 
       emailInput.removeAttribute('aria-invalid');
-      if (feedback) feedback.textContent = '';
+      setFeedback('', '');
 
       const role = (roleInput && roleInput.value) || 'Member';
 
@@ -465,16 +563,16 @@
       const originY = clamp(rect.top + rect.height / 2, 40, window.innerHeight - 40);
 
       waitlistForm.hidden = true;
+      waitlistForm.classList.add('is-hidden');
       if (successPanel) {
         successPanel.hidden = false;
         successPanel.setAttribute('aria-hidden', 'false');
+        successPanel.classList.add('is-visible');
         if (successRole) successRole.textContent = role;
         if (!successPanel.hasAttribute('tabindex')) {
           successPanel.setAttribute('tabindex', '-1');
         }
         successPanel.focus({ preventScroll: true });
-      } else if (successRole) {
-        successRole.textContent = role;
       }
 
       burstConfetti(originX, originY);
@@ -483,10 +581,12 @@
     if (resetBtn && successPanel) {
       resetBtn.addEventListener('click', () => {
         successPanel.setAttribute('aria-hidden', 'true');
+        successPanel.classList.remove('is-visible');
         successPanel.hidden = true;
         waitlistForm.hidden = false;
+        waitlistForm.classList.remove('is-hidden');
         waitlistForm.reset();
-        if (feedback) feedback.textContent = '';
+        setFeedback('', '');
         if (emailInput) {
           emailInput.removeAttribute('aria-invalid');
           emailInput.focus({ preventScroll: true });
