@@ -1,735 +1,609 @@
-/**
- * LEZZFLOW. v2 — Hyperlocal Commerce Platform
- * Award-Winning Rebuild Controller
- * Pure Vanilla JS • Zero Dependencies • Butter-Smooth Performance
- */
-
+/* ==========================================================================
+   lezzflow. — main.js
+   Vanilla JS. Transform/opacity-only motion. IntersectionObserver-driven.
+   ========================================================================== */
 (() => {
   'use strict';
 
-  // Environment & Accessibility Capabilities
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouchDevice = window.matchMedia('(hover: none) or (pointer: coarse)').matches;
+  /* ------------------------------------------------------------------ *
+   * 0. Environment & helpers
+   * ------------------------------------------------------------------ */
+  const docEl = document.documentElement;
+  docEl.classList.add('js');
 
-  // DOM Content Loaded Bootstrapper — each init is isolated so one
-  // failure can never prevent the rest (menu, waitlist) from working.
-  document.addEventListener('DOMContentLoaded', () => {
-    const safeInit = (name, fn) => {
-      try {
-        fn();
-      } catch (err) {
-        console.warn(`[lezzflow] ${name} failed:`, err);
-      }
-    };
+  const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointerQuery  = window.matchMedia('(pointer: fine)');
+  const DESKTOP_BP = 1024;
 
-    safeInit('preloader', initPreloader);
-    safeInit('scrollEngine', initScrollEngine);
-    safeInit('revealObserver', initRevealObserver);
-    safeInit('statCounters', initStatCounters);
-    safeInit('mobileMenu', initMobileMenu);
-    safeInit('waitlist', initWaitlist);
-    safeInit('anchorScrolling', initAnchorScrolling);
-    safeInit('ecosystemVideo', initEcosystemVideo);
+  const prefersReduced = () => reduceMotionQuery.matches;
+  const pointerFX = () =>
+    finePointerQuery.matches && !prefersReduced() && window.innerWidth >= DESKTOP_BP;
 
-    // Desktop-only motion enhancements
-    if (!isTouchDevice && !prefersReducedMotion) {
-      safeInit('cursorGlow', initCursorGlow);
-      safeInit('heroLogoParallax', initHeroLogoParallax);
-      safeInit('card3DTilt', initCard3DTilt);
-      safeInit('magneticButtons', initMagneticButtons);
+  const $  = (sel, ctx = document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const lerp  = (a, b, t) => a + (b - a) * t;
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  /* ------------------------------------------------------------------ *
+   * 1. Preloader — percentage counter + blue curtain lift
+   * ------------------------------------------------------------------ */
+  const preloader = $('#preloader');
+
+  const finishPreloader = () => {
+    if (!preloader || preloader.classList.contains('is-done')) return;
+    preloader.classList.add('is-done');
+    document.body.classList.add('is-loaded');
+    preloader.setAttribute('aria-hidden', 'true');
+    window.setTimeout(() => {
+      preloader.classList.add('is-gone');
+    }, prefersReduced() ? 80 : 950);
+  };
+
+  if (preloader) {
+    const countEl = $('#preloader-count');
+    const fillEl  = $('#preloader-fill');
+
+    if (prefersReduced()) {
+      if (countEl) countEl.textContent = '100%';
+      if (fillEl) fillEl.style.transform = 'scaleX(1)';
+      finishPreloader();
+    } else {
+      const DURATION = 1500;
+      let startTime = null;
+      const step = (now) => {
+        if (startTime === null) startTime = now;
+        const raw = clamp((now - startTime) / DURATION, 0, 1);
+        const eased = easeOutCubic(raw);
+        if (countEl) countEl.textContent = Math.round(eased * 100) + '%';
+        if (fillEl) fillEl.style.transform = 'scaleX(' + eased + ')';
+        if (raw < 1) window.requestAnimationFrame(step);
+        else finishPreloader();
+      };
+      window.requestAnimationFrame(step);
+      // Safety net — never trap anyone behind the curtain.
+      window.setTimeout(finishPreloader, 4200);
     }
-  });
-
-  /* ==========================================================================
-     01. SIGNATURE MOMENT 1: PRELOADER (Logo Reveal + Counter + Curtain Lift)
-     ========================================================================== */
-  function initPreloader() {
-    const preloader = document.getElementById('preloader');
-    const fillBar = document.getElementById('preloader-fill');
-    const counterText = document.getElementById('preloader-number');
-    const heroSection = document.getElementById('hero');
-
-    if (!preloader) return;
-
-    if (prefersReducedMotion) {
-      preloader.style.display = 'none';
-      if (heroSection) heroSection.classList.add('is-revealed');
-      return;
-    }
-
-    let progress = 0;
-    const duration = 650; // ms
-    const startTime = performance.now();
-
-    const updateLoader = (now) => {
-      const elapsed = now - startTime;
-      const t = Math.min(elapsed / duration, 1);
-      // Quad ease-out
-      progress = Math.floor(t * (2 - t) * 100);
-
-      if (fillBar) {
-        fillBar.style.transform = `scaleX(${progress / 100})`;
-      }
-      if (counterText) {
-        counterText.textContent = `${progress}%`;
-      }
-
-      if (t < 1) {
-        requestAnimationFrame(updateLoader);
-      } else {
-        // Complete - lift curtain
-        setTimeout(() => {
-          preloader.classList.add('is-loaded');
-          if (heroSection) {
-            heroSection.classList.add('is-revealed');
-          }
-
-          // Clean up DOM after curtain lift animation completes
-          setTimeout(() => {
-            preloader.style.display = 'none';
-            preloader.setAttribute('aria-hidden', 'true');
-          }, 850);
-        }, 120);
-      }
-    };
-
-    requestAnimationFrame(updateLoader);
+  } else {
+    document.body.classList.add('is-loaded');
   }
 
-  /* ==========================================================================
-     02. PERFORMANCE ENGINE: SINGLE rAF SCROLL HANDLER (Passive, Cached Measurements)
-     ========================================================================== */
-  function initScrollEngine() {
-    const progressBar = document.getElementById('scroll-progress');
-    const navbar = document.getElementById('navbar');
-    const stackingCards = document.querySelectorAll('.stack-card');
-    const backToTopBtn = document.getElementById('back-to-top-btn');
+  /* ------------------------------------------------------------------ *
+   * 2. Mobile drawer — keyboard-operable, focus-managed
+   * ------------------------------------------------------------------ */
+  const navToggle = $('#nav-toggle');
+  const drawer = $('#mobile-drawer');
 
-    let isTicking = false;
-    let cachedMaxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    let cachedScrollY = window.scrollY;
-    let isNavbarScrolled = false;
-
-    // Cache metrics on load and debounced resize
-    const updateMetrics = () => {
-      cachedMaxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    };
-
-    let resizeTimer = null;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(updateMetrics, 200);
-    }, { passive: true });
-
-    // Single rAF Frame Execution
-    const onFrame = () => {
-      // 1. Scroll Progress Bar (scaleX transform only)
-      if (progressBar) {
-        const ratio = Math.min(1, Math.max(0, cachedScrollY / cachedMaxScroll));
-        progressBar.style.transform = `scaleX(${ratio})`;
-      }
-
-      // 2. Compact Glass Navbar Toggle
-      if (navbar) {
-        if (cachedScrollY > 35 && !isNavbarScrolled) {
-          navbar.classList.add('scrolled');
-          isNavbarScrolled = true;
-        } else if (cachedScrollY <= 35 && isNavbarScrolled) {
-          navbar.classList.remove('scrolled');
-          isNavbarScrolled = false;
-        }
-      }
-
-      // 3. Subtle GPU Transform for Sticky Stacking Deck
-      if (stackingCards.length > 1 && !prefersReducedMotion) {
-        const viewportHeight = window.innerHeight;
-        stackingCards.forEach((card, idx) => {
-          const rect = card.getBoundingClientRect();
-          // If card is pinned near top, subtly compress previous cards
-          if (rect.top <= 140 && idx < stackingCards.length - 1) {
-            card.style.transform = 'scale(0.985)';
-            card.style.opacity = '0.92';
-          } else {
-            card.style.transform = 'scale(1)';
-            card.style.opacity = '1';
-          }
-        });
-      }
-
-      isTicking = false;
-    };
-
-    // Passive Window Scroll Listener
-    window.addEventListener('scroll', () => {
-      cachedScrollY = window.scrollY;
-      if (!isTicking) {
-        requestAnimationFrame(onFrame);
-        isTicking = true;
-      }
-    }, { passive: true });
-
-    // Initial pass
-    onFrame();
-
-    // Back to top click handler
-    if (backToTopBtn) {
-      backToTopBtn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
+  function openDrawer() {
+    if (!drawer || !navToggle) return;
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    navToggle.classList.add('is-open');
+    navToggle.setAttribute('aria-expanded', 'true');
+    navToggle.setAttribute('aria-label', 'Close navigation menu');
+    document.body.classList.add('no-scroll');
+    const firstLink = $('a, button', drawer);
+    if (firstLink) firstLink.focus({ preventScroll: true });
   }
 
-  /* ==========================================================================
-     03. GPU REVEAL SYSTEM: IntersectionObserver
-     ========================================================================== */
-  function initRevealObserver() {
-    const revealItems = document.querySelectorAll('.reveal-item');
-    if (!revealItems.length) return;
+  function closeDrawer(returnFocus) {
+    if (!drawer || !navToggle || !drawer.classList.contains('is-open')) return;
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    navToggle.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    navToggle.setAttribute('aria-label', 'Open navigation menu');
+    document.body.classList.remove('no-scroll');
+    if (returnFocus) navToggle.focus({ preventScroll: true });
+  }
 
-    if (prefersReducedMotion) {
-      revealItems.forEach(el => el.classList.add('is-revealed'));
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed');
-          obs.unobserve(entry.target);
-        }
-      });
-    }, {
-      threshold: 0.12,
-      rootMargin: '0px 0px -40px 0px'
+  if (navToggle && drawer) {
+    navToggle.addEventListener('click', () => {
+      if (drawer.classList.contains('is-open')) closeDrawer(true);
+      else openDrawer();
     });
 
-    revealItems.forEach(item => observer.observe(item));
+    $$('a', drawer).forEach((link) => {
+      link.addEventListener('click', () => closeDrawer(false));
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDrawer(true);
+    });
+
+    // Lightweight focus trap while the drawer is open.
+    drawer.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || !drawer.classList.contains('is-open')) return;
+      const focusables = $$('a[href], button:not([disabled])', drawer);
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   }
 
-  /* ==========================================================================
-     04. SIGNATURE MOMENT 5: STAT COUNTERS (Count-Up Animation on View)
-     ========================================================================== */
-  function initStatCounters() {
-    const counterElements = document.querySelectorAll('.stat-number');
-    if (!counterElements.length) return;
+  /* ------------------------------------------------------------------ *
+   * 3. Single rAF-throttled passive scroll handler
+   *    — scroll progress bar, nav state, back-to-top visibility
+   * ------------------------------------------------------------------ */
+  const progressBar = $('#scroll-progress');
+  const nav = $('#nav');
+  const backToTop = $('#back-to-top') || $('[data-back-to-top]');
 
-    const animateNumber = (element) => {
-      const targetVal = parseFloat(element.getAttribute('data-target') || '0');
-      const suffix = element.getAttribute('data-suffix') || '';
-      const prefix = element.getAttribute('data-prefix') || '';
-      const decimals = parseInt(element.getAttribute('data-decimals') || '0', 10);
+  let maxScroll = 1;
+  const measure = () => {
+    maxScroll = Math.max(docEl.scrollHeight - window.innerHeight, 1);
+  };
+  measure();
 
-      // Never render NaN: if the target is not a valid number, keep the
-      // static HTML value (which already holds the correct final text).
-      if (!Number.isFinite(targetVal)) {
-        return;
+  let scrollTicking = false;
+  const onScroll = () => {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    window.requestAnimationFrame(() => {
+      const y = window.scrollY || 0;
+      if (progressBar) {
+        progressBar.style.transform = 'scaleX(' + clamp(y / maxScroll, 0, 1) + ')';
       }
-
-      if (prefersReducedMotion) {
-        const formatted = decimals > 0 ? targetVal.toFixed(decimals) : targetVal.toString();
-        element.textContent = `${prefix}${formatted}${suffix}`;
-        return;
+      if (nav) nav.classList.toggle('is-scrolled', y > 12);
+      if (backToTop) {
+        backToTop.classList.toggle('is-visible', y > window.innerHeight * 0.75);
       }
+      scrollTicking = false;
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-      const duration = 1800; // ms
-      const startTime = performance.now();
+  if (backToTop) {
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: prefersReduced() ? 'auto' : 'smooth' });
+    });
+  }
 
-      const tick = (now) => {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        // Cubic ease out
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const current = targetVal * ease;
+  /* ------------------------------------------------------------------ *
+   * 4. Scroll reveals — IntersectionObserver, CSS transitions do the rest
+   * ------------------------------------------------------------------ */
+  const revealEls = $$('.reveal, [data-reveal]');
+  if (prefersReduced() || !('IntersectionObserver' in window)) {
+    revealEls.forEach((el) => el.classList.add('is-visible'));
+  } else if (revealEls.length) {
+    const revealIO = new IntersectionObserver((entries, io) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    revealEls.forEach((el) => revealIO.observe(el));
+  }
 
-        const valString = decimals > 0 ? current.toFixed(decimals) : Math.floor(current).toString();
-        element.textContent = `${prefix}${valString}${suffix}`;
+  /* ------------------------------------------------------------------ *
+   * 5. Stats count-up — fires once when the band enters view
+   * ------------------------------------------------------------------ */
+  const counters = $$('[data-count]');
 
-        if (progress < 1) {
-          requestAnimationFrame(tick);
-        } else {
-          const finalString = decimals > 0 ? targetVal.toFixed(decimals) : targetVal.toString();
-          element.textContent = `${prefix}${finalString}${suffix}`;
-        }
-      };
+  const renderCounter = (el, value) => {
+    const decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    const prefix = el.getAttribute('data-prefix') || '';
+    const suffix = el.getAttribute('data-suffix') || '';
+    const num = decimals > 0
+      ? value.toFixed(decimals)
+      : Math.round(value).toLocaleString('en-US');
+    el.textContent = prefix + num + suffix;
+  };
 
-      requestAnimationFrame(tick);
+  const animateCounter = (el) => {
+    const target = parseFloat(el.getAttribute('data-count'));
+    if (Number.isNaN(target)) return;
+    if (prefersReduced()) {
+      renderCounter(el, target);
+      return;
+    }
+    const duration = parseInt(el.getAttribute('data-duration') || '1800', 10);
+    let t0 = null;
+    const step = (now) => {
+      if (t0 === null) t0 = now;
+      const p = clamp((now - t0) / duration, 0, 1);
+      renderCounter(el, target * easeOutCubic(p));
+      if (p < 1) window.requestAnimationFrame(step);
+      else renderCounter(el, target);
     };
+    window.requestAnimationFrame(step);
+  };
 
-    const counterObserver = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateNumber(entry.target);
-          obs.unobserve(entry.target);
+  if (counters.length) {
+    if (!('IntersectionObserver' in window)) {
+      counters.forEach(animateCounter);
+    } else {
+      const countIO = new IntersectionObserver((entries, io) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          animateCounter(entry.target);
+          io.unobserve(entry.target);
+        });
+      }, { threshold: 0.4 });
+      counters.forEach((el) => countIO.observe(el));
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 6. Lazy videos — hydrate on approach, play in view, pause off-screen
+   * ------------------------------------------------------------------ */
+  const videoSet = new Set();
+  $$('video[data-src]').forEach((v) => videoSet.add(v));
+  $$('video source[data-src]').forEach((s) => {
+    const v = s.closest('video');
+    if (v) videoSet.add(v);
+  });
+  const lazyVideos = Array.from(videoSet);
+
+  const hydrateVideo = (video) => {
+    if (video.dataset.hydrated === 'true') return;
+    video.dataset.hydrated = 'true';
+    if (video.getAttribute('data-src')) {
+      video.src = video.getAttribute('data-src');
+      video.removeAttribute('data-src');
+    }
+    $$('source[data-src]', video).forEach((source) => {
+      source.src = source.getAttribute('data-src');
+      source.removeAttribute('data-src');
+    });
+    video.preload = 'auto';
+    video.load();
+  };
+
+  const tryPlay = (video) => {
+    if (prefersReduced()) return;
+    video.muted = true;
+    const p = video.play();
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+  };
+
+  if (lazyVideos.length) {
+    if (prefersReduced()) {
+      // No autoplay for reduced motion — hand control to the viewer.
+      lazyVideos.forEach((v) => {
+        v.removeAttribute('autoplay');
+        v.setAttribute('controls', '');
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      const loadIO = new IntersectionObserver((entries, io) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          hydrateVideo(entry.target);
+          io.unobserve(entry.target);
+        });
+      }, { rootMargin: '300px 0px', threshold: 0.01 });
+
+      const playIO = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            if (video.dataset.hydrated === 'true') tryPlay(video);
+          } else if (!video.paused) {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.25 });
+
+      lazyVideos.forEach((v) => {
+        loadIO.observe(v);
+        playIO.observe(v);
+      });
+    } else {
+      lazyVideos.forEach((v) => {
+        hydrateVideo(v);
+        tryPlay(v);
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 7. Confetti — canvas burst, waitlist submit only
+   * ------------------------------------------------------------------ */
+  const confettiCanvas = $('#confetti-canvas');
+  let confettiRunning = false;
+
+  function burstConfetti(originX, originY) {
+    if (!confettiCanvas || prefersReduced() || confettiRunning) return;
+    confettiRunning = true;
+
+    const ctx = confettiCanvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    confettiCanvas.width = window.innerWidth * dpr;
+    confettiCanvas.height = window.innerHeight * dpr;
+    confettiCanvas.classList.add('is-active');
+
+    const COLORS = ['#1f5cff', '#2456ff', '#6f9bff', '#bcd2ff', '#ffffff'];
+    const COUNT = window.innerWidth < 640 ? 70 : 130;
+    const parts = [];
+
+    for (let i = 0; i < COUNT; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (5 + Math.random() * 9) * dpr;
+      parts.push({
+        x: originX * dpr,
+        y: originY * dpr,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 6 * dpr,
+        size: (4 + Math.random() * 6) * dpr,
+        color: COLORS[i % COLORS.length],
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.3,
+        rect: Math.random() < 0.55,
+        life: 1,
+        decay: 0.008 + Math.random() * 0.009
+      });
+    }
+
+    let last = performance.now();
+    const frame = (now) => {
+      const dt = clamp((now - last) / 16.7, 0.5, 3);
+      last = now;
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      let alive = false;
+
+      for (const p of parts) {
+        if (p.life <= 0) continue;
+        alive = true;
+        p.vy += 0.22 * dpr * dt;
+        p.vx *= 0.99;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.rot += p.vr * dt;
+        p.life -= p.decay * dt;
+
+        ctx.save();
+        ctx.globalAlpha = clamp(p.life, 0, 1);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        if (p.rect) {
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.62);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      if (alive) {
+        window.requestAnimationFrame(frame);
+      } else {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        confettiCanvas.classList.remove('is-active');
+        confettiRunning = false;
+      }
+    };
+    window.requestAnimationFrame(frame);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 8. Waitlist — role pills, validation, animated success + confetti
+   * ------------------------------------------------------------------ */
+  const waitlistForm = $('#waitlist-form');
+
+  const rolePills = $$('.role-pill, [data-role-pill]');
+  const roleInput = $('#waitlist-role');
+  if (rolePills.length)if (rolePills.length) {
+    setupRolePills(rolePills);
+  } else {
+    // Actual markup uses button.role[data-role] — fall back to it.
+    setupRolePills($$('button.role[data-role]'));
+  }
+
+  function setupRolePills(pills) {
+    if (!pills.length || !roleInput) return;
+    pills.forEach((pill) => {
+      const isActive = pill.classList.contains('is-active');
+      pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      if (isActive) roleInput.value = pill.getAttribute('data-role') || '';
+      pill.addEventListener('click', () => {
+        pills.forEach((p) => {
+          const current = p === pill;
+          p.classList.toggle('is-active', current);
+          p.setAttribute('aria-pressed', current ? 'true' : 'false');
+        });
+        roleInput.value = pill.getAttribute('data-role') || '';
+      });
+    });
+  }
+
+  if (waitlistForm) {
+    const emailInput = $('#waitlist-email');
+    const feedback = $('#waitlist-feedback');
+    const successPanel = $('#waitlist-success');
+    const successRole = $('#success-role');
+    const resetBtn = $('#waitlist-reset');
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (emailInput) {
+      emailInput.addEventListener('input', () => {
+        emailInput.removeAttribute('aria-invalid');
+        if (feedback) feedback.textContent = '';
+      });
+    }
+
+    waitlistForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = emailInput ? emailInput.value.trim() : '';
+
+      if (!emailInput || !EMAIL_RE.test(email)) {
+        if (feedback) feedback.textContent = 'Please enter a valid email address.';
+        if (emailInput) {
+          emailInput.setAttribute('aria-invalid', 'true');
+          emailInput.focus({ preventScroll: true });
+        }
+        return;
+      }
+
+      emailInput.removeAttribute('aria-invalid');
+      if (feedback) feedback.textContent = '';
+
+      const role = (roleInput && roleInput.value) || 'Member';
+
+      try {
+        window.localStorage.setItem(
+          'lezzflow-waitlist',
+          JSON.stringify({ email: email, role: role, at: Date.now() })
+        );
+      } catch (err) { /* storage unavailable — no-op */ }
+
+      // Confetti origin: form centre, measured once before hiding.
+      const rect = waitlistForm.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = clamp(rect.top + rect.height / 2, 40, window.innerHeight - 40);
+
+      waitlistForm.hidden = true;
+      if (successPanel) {
+        successPanel.hidden = false;
+        successPanel.setAttribute('aria-hidden', 'false');
+        if (successRole) successRole.textContent = role;
+        if (!successPanel.hasAttribute('tabindex')) {
+          successPanel.setAttribute('tabindex', '-1');
+        }
+        successPanel.focus({ preventScroll: true });
+      } else if (successRole) {
+        successRole.textContent = role;
+      }
+
+      burstConfetti(originX, originY);
+    });
+
+    if (resetBtn && successPanel) {
+      resetBtn.addEventListener('click', () => {
+        successPanel.setAttribute('aria-hidden', 'true');
+        successPanel.hidden = true;
+        waitlistForm.hidden = false;
+        waitlistForm.reset();
+        if (feedback) feedback.textContent = '';
+        if (emailInput) {
+          emailInput.removeAttribute('aria-invalid');
+          emailInput.focus({ preventScroll: true });
+        }
+        // Re-sync pills with the hidden input's restored default value.
+        const pills = $$('button.role[data-role]');
+        if (pills.length && roleInput) {
+          const fallback = pills[0];
+          const match = pills.filter(
+            (p) => p.getAttribute('data-role') === roleInput.value
+          )[0] || fallback;
+          pills.forEach((p) => {
+            const current = p === match;
+            p.classList.toggle('is-active', current);
+            p.setAttribute('aria-pressed', current ? 'true' : 'false');
+          });
+          roleInput.value = match.getAttribute('data-role') || '';
         }
       });
-    }, { threshold: 0.25 });
-
-    counterElements.forEach(el => counterObserver.observe(el));
+    }
   }
 
-  /* ==========================================================================
-     05. SIGNATURE MOMENT: CUSTOM CURSOR GLOW (Desktop Only, Lerp rAF)
-     ========================================================================== */
-  function initCursorGlow() {
-    const cursor = document.getElementById('cursor-glow');
-    if (!cursor) return;
+  /* ------------------------------------------------------------------ *
+   * 9. Magnetic buttons — rAF-batched translate, desktop pointers only
+   * ------------------------------------------------------------------ */
+  const magneticEls = $$('[data-magnetic]');
+  if (magneticEls.length && pointerFX()) {
+    magneticEls.forEach((el) => {
+      const strength = parseFloat(el.getAttribute('data-magnetic')) || 0.35;
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+      let rafId = null;
 
-    let targetX = -500;
-    let targetY = -500;
-    let currentX = -500;
-    let currentY = -500;
-    let isMoving = false;
+      const applyMagnet = () => {
+        rafId = null;
+        currentX = lerp(currentX, targetX, 0.18);
+        currentY = lerp(currentY, targetY, 0.18);
+        if (Math.abs(currentX) < 0.05 && Math.abs(currentY) < 0.05 &&
+            targetX === 0 && targetY === 0) {
+          currentX = 0;
+          currentY = 0;
+          el.style.transform = '';
+          return;
+        }
+        el.style.transform =
+          'translate3d(' + currentX.toFixed(2) + 'px, ' + currentY.toFixed(2) + 'px, 0)';
+        rafId = window.requestAnimationFrame(applyMagnet);
+      };
 
-    window.addEventListener('pointermove', (e) => {
-      targetX = e.clientX;
-      targetY = e.clientY;
-      if (!isMoving) {
-        cursor.classList.add('is-active');
-        isMoving = true;
+      const scheduleMagnet = () => {
+        if (rafId === null) rafId = window.requestAnimationFrame(applyMagnet);
+      };
+
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        targetX = (e.clientX - (rect.left + rect.width / 2)) * strength;
+        targetY = (e.clientY - (rect.top + rect.height / 2)) * strength;
+        scheduleMagnet();
+      });
+
+      el.addEventListener('mouseleave', () => {
+        targetX = 0;
+        targetY = 0;
+        scheduleMagnet();
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 10. Cursor glow — one fixed div, lerped follow, desktop only
+   * ------------------------------------------------------------------ */
+  if (pointerFX()) {
+    const glow = document.createElement('div');
+    glow.className = 'cursor-glow';
+    glow.setAttribute('aria-hidden', 'true');
+    glow.style.position = 'fixed';
+    glow.style.top = '0';
+    glow.style.left = '0';
+    glow.style.pointerEvents = 'none';
+    document.body.appendChild(glow);
+
+    let glowX = window.innerWidth / 2;
+    let glowY = window.innerHeight / 2;
+    let glowTargetX = glowX;
+    let glowTargetY = glowY;
+    let glowRaf = null;
+
+    const renderGlow = () => {
+      glowRaf = null;
+      glowX = lerp(glowX, glowTargetX, 0.16);
+      glowY = lerp(glowY, glowTargetY, 0.16);
+      glow.style.transform =
+        'translate3d(' + glowX.toFixed(1) + 'px, ' + glowY.toFixed(1) + 'px, 0)' +
+        ' translate(-50%, -50%)';
+      if (Math.abs(glowX - glowTargetX) > 0.1 || Math.abs(glowY - glowTargetY) > 0.1) {
+        glowRaf = window.requestAnimationFrame(renderGlow);
       }
+    };
+
+    window.addEventListener('mousemove', (e) => {
+      glowTargetX = e.clientX;
+      glowTargetY = e.clientY;
+      glow.classList.add('is-visible');
+      if (glowRaf === null) glowRaf = window.requestAnimationFrame(renderGlow);
     }, { passive: true });
 
     document.addEventListener('mouseleave', () => {
-      cursor.classList.remove('is-active');
-    });
-
-    const render = () => {
-      // Lerp smoothing factor
-      currentX += (targetX - currentX) * 0.14;
-      currentY += (targetY - currentY) * 0.14;
-
-      cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-      requestAnimationFrame(render);
-    };
-
-    requestAnimationFrame(render);
-  }
-
-  /* ==========================================================================
-     06. SIGNATURE MOMENT 2: HERO 3D EMBLEM LOGO TILT (Desktop Parallax)
-     ========================================================================== */
-  function initHeroLogoParallax() {
-    const heroEmblem = document.getElementById('hero-emblem');
-    const heroVisual = document.getElementById('hero-media-card');
-    if (!heroEmblem || !heroVisual) return;
-
-    let targetRotX = 0;
-    let targetRotY = 0;
-    let targetTransX = 0;
-    let targetTransY = 0;
-
-    let currRotX = 0;
-    let currRotY = 0;
-    let currTransX = 0;
-    let currTransY = 0;
-
-    heroVisual.addEventListener('pointermove', (e) => {
-      const rect = heroVisual.getBoundingClientRect();
-      const normX = ((e.clientX - rect.left) / rect.width) * 2 - 1; // -1 to 1
-      const normY = ((e.clientY - rect.top) / rect.height) * 2 - 1; // -1 to 1
-
-      targetRotX = -normY * 14;
-      targetRotY = normX * 14;
-      targetTransX = normX * 18;
-      targetTransY = normY * 14;
-    }, { passive: true });
-
-    heroVisual.addEventListener('pointerleave', () => {
-      targetRotX = 0;
-      targetRotY = 0;
-      targetTransX = 0;
-      targetTransY = 0;
-    });
-
-    const loop = () => {
-      currRotX += (targetRotX - currRotX) * 0.1;
-      currRotY += (targetRotY - currRotY) * 0.1;
-      currTransX += (targetTransX - currTransX) * 0.1;
-      currTransY += (targetTransY - currTransY) * 0.1;
-
-      heroEmblem.style.transform = `translate3d(${currTransX}px, ${currTransY}px, 0) rotateX(${currRotX}deg) rotateY(${currRotY}deg)`;
-      requestAnimationFrame(loop);
-    };
-
-    requestAnimationFrame(loop);
-  }
-
-  /* ==========================================================================
-     07. SIGNATURE MOMENT 6: 3D TILT CARDS (Customers & Sellers)
-     ========================================================================== */
-  function initCard3DTilt() {
-    const tiltCards = document.querySelectorAll('[data-tilt]');
-    if (!tiltCards.length) return;
-
-    tiltCards.forEach(card => {
-      const cardInner = card.querySelector('.tilt-card-inner');
-      if (!cardInner) return;
-
-      let rect = card.getBoundingClientRect();
-
-      card.addEventListener('pointerenter', () => {
-        rect = card.getBoundingClientRect();
-      }, { passive: true });
-
-      card.addEventListener('pointermove', (e) => {
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const normX = (x / rect.width) * 2 - 1;
-        const normY = (y / rect.height) * 2 - 1;
-
-        const rotX = -normY * 8;
-        const rotY = normX * 8;
-
-        cardInner.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.015, 1.015, 1.015)`;
-        card.style.setProperty('--glare-x', `${(x / rect.width) * 100}%`);
-        card.style.setProperty('--glare-y', `${(y / rect.height) * 100}%`);
-      }, { passive: true });
-
-      card.addEventListener('pointerleave', () => {
-        cardInner.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-      });
+      glow.classList.remove('is-visible');
     });
   }
 
-  /* ==========================================================================
-     08. MAGNETIC CTA BUTTONS (Mouse Tracking with Clamped Translation)
-     ========================================================================== */
-  function initMagneticButtons() {
-    const magneticBtns = document.querySelectorAll('.btn-magnetic');
-    if (!magneticBtns.length) return;
-
-    magneticBtns.forEach(btn => {
-      btn.addEventListener('mousemove', (e) => {
-        const rect = btn.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-
-        const deltaX = Math.max(-14, Math.min(14, (e.clientX - centerX) * 0.35));
-        const deltaY = Math.max(-14, Math.min(14, (e.clientY - centerY) * 0.35));
-
-        btn.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
-      });
-
-      btn.addEventListener('mouseleave', () => {
-        btn.style.transform = 'translate3d(0, 0, 0)';
-      });
-    });
-  }
-
-  /* ==========================================================================
-     09. MOBILE NAVIGATION MENU DRAWER
-     ========================================================================== */
-  function initMobileMenu() {
-    const navToggle = document.getElementById('nav-toggle');
-    const drawer = document.getElementById('mobile-drawer');
-    if (!navToggle || !drawer) return;
-
-    const toggle = (isOpen) => {
-      const openState = typeof isOpen === 'boolean' ? isOpen : !drawer.classList.contains('is-open');
-      drawer.classList.toggle('is-open', openState);
-      navToggle.classList.toggle('is-open', openState);
-      navToggle.setAttribute('aria-expanded', openState ? 'true' : 'false');
-      drawer.setAttribute('aria-hidden', openState ? 'false' : 'true');
-      document.body.style.overflow = openState ? 'hidden' : '';
-    };
-
-    navToggle.addEventListener('click', () => toggle());
-
-    // Close when clicking any nav link
-    drawer.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => toggle(false));
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
-        toggle(false);
-      }
-    });
-
-    // Close on resize above 860px
-    window.addEventListener('resize', () => {
-      if (drawer.classList.contains('is-open') && window.innerWidth > 860) {
-        toggle(false);
-      }
-    }, { passive: true });
-  }
-
-  /* ==========================================================================
-     10. SIGNATURE MOMENT 7: WAITLIST SYSTEM & CONFETTI BURST
-     ========================================================================== */
-  function initWaitlist() {
-    const form = document.getElementById('waitlist-form');
-    const emailInput = document.getElementById('waitlist-email-input');
-    const roleInput = document.getElementById('waitlist-role-input');
-    const rolePills = document.querySelectorAll('.role-pill');
-    const successCard = document.getElementById('waitlist-success');
-    const queueChip = document.getElementById('success-queue-chip');
-    const roleChip = document.getElementById('success-role-chip');
-    const feedback = document.getElementById('form-feedback');
-    const resetBtn = document.getElementById('waitlist-reset-btn');
-    const submitBtn = document.getElementById('waitlist-submit-btn');
-
-    if (!form) return;
-
-    // Check LocalStorage on initial load
-    try {
-      const savedData = localStorage.getItem('lezzflow_waitlist');
-      if (savedData) {
-        const parsed = JSON.parse(savedData);
-        if (parsed) {
-          renderSuccess(parsed.role || 'Shopper');
-        }
-      }
-    } catch (e) {
-      console.warn('LocalStorage access note:', e);
-    }
-
-    // Role selection pills
-    rolePills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        rolePills.forEach(p => {
-          p.classList.remove('active');
-          p.setAttribute('aria-pressed', 'false');
-        });
-        pill.classList.add('active');
-        pill.setAttribute('aria-pressed', 'true');
-        const role = pill.getAttribute('data-role');
-        if (roleInput) roleInput.value = role;
-      });
-    });
-
-    // Email validation
-    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-    // Form submission
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const email = emailInput.value.trim();
-      const role = roleInput ? roleInput.value : 'Customer';
-
-      if (!isValidEmail(email)) {
-        if (feedback) {
-          feedback.className = 'form-feedback error';
-          feedback.textContent = 'Please provide a valid email address.';
-        }
-        emailInput.focus();
-        return;
-      }
-
-      if (feedback) feedback.textContent = '';
-
-      // Button loading indicator
-      const originalHtml = submitBtn.innerHTML;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Securing spot...</span>`;
-
-      setTimeout(() => {
-        const entry = {
-          email,
-          role,
-          joinedAt: new Date().toISOString()
-        };
-
-        try {
-          localStorage.setItem('lezzflow_waitlist', JSON.stringify(entry));
-        } catch (err) {
-          console.warn('LocalStorage save error:', err);
-        }
-
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalHtml;
-
-        renderSuccess(role);
-        triggerConfetti();
-      }, 550);
-    });
-
-    function renderSuccess(role) {
-      if (queueChip) queueChip.textContent = 'Spot reserved';
-      if (roleChip) roleChip.textContent = `Role: ${role}`;
-      form.style.display = 'none';
-      if (successCard) {
-        successCard.classList.add('is-visible');
-        successCard.setAttribute('aria-hidden', 'false');
-      }
-    }
-
-    // Reset button
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        try {
-          localStorage.removeItem('lezzflow_waitlist');
-        } catch (err) {
-          console.warn(err);
-        }
-        if (successCard) {
-          successCard.classList.remove('is-visible');
-          successCard.setAttribute('aria-hidden', 'true');
-        }
-        form.style.display = 'block';
-        if (emailInput) {
-          emailInput.value = '';
-          emailInput.focus();
-        }
-      });
-    }
-  }
-
-  /* ==========================================================================
-     11. HIGH-PERFORMANCE CONFETTI (Triggered Only on Submit, Canvas Physics)
-     ========================================================================== */
-  function triggerConfetti() {
-    const canvas = document.getElementById('confetti-canvas');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.scale(dpr, dpr);
-
-    const colors = ['#2f7bff', '#5e9bff', '#ffb224', '#ffffff', '#38bdf8'];
-    const particles = [];
-    const count = 80;
-
-    const originX = window.innerWidth / 2;
-    const originY = window.innerHeight * 0.55;
-
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: originX,
-        y: originY,
-        vx: (Math.random() - 0.5) * 16,
-        vy: (Math.random() - 1.25) * 18 - 4,
-        size: Math.random() * 4 + 2,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        gravity: 0.42,
-        drag: 0.965,
-        opacity: 1,
-        rotation: Math.random() * 360,
-        rotSpeed: (Math.random() - 0.5) * 14
-      });
-    }
-
-    let animId;
-
-    const render = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-      let alive = 0;
-
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += p.gravity;
-        p.vx *= p.drag;
-        p.vy *= p.drag;
-        p.opacity -= 0.012;
-        p.rotation += p.rotSpeed;
-
-        if (p.opacity > 0) {
-          alive++;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate((p.rotation * Math.PI) / 180);
-          ctx.fillStyle = p.color;
-          ctx.globalAlpha = Math.max(0, p.opacity);
-          ctx.fillRect(-p.size, -p.size, p.size * 2, p.size * 2);
-          ctx.restore();
-        }
-      });
-
-      if (alive > 0) {
-        animId = requestAnimationFrame(render);
-      } else {
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        cancelAnimationFrame(animId);
-      }
-    };
-
-    render();
-  }
-
-  /* ==========================================================================
-     12. SMOOTH ANCHOR SCROLLING WITH NAVBAR OFFSET
-     ========================================================================== */
-  function initAnchorScrolling() {
-    const links = document.querySelectorAll('a[href^="#"]');
-
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
-        const targetId = link.getAttribute('href');
-        if (targetId === '#' || !targetId) return;
-
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-          e.preventDefault();
-          const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height') || '80', 10);
-          const top = targetElement.getBoundingClientRect().top + window.scrollY - navHeight;
-
-          window.scrollTo({
-            top,
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-  }
-
-  /* ==========================================================================
-     13. ECOSYSTEM VIDEO CONTROLLER (IntersectionObserver Play/Pause & Fallback)
-     ========================================================================== */
-  function initEcosystemVideo() {
-    const video = document.querySelector('.ecosystem-video');
-    if (!video) return;
-
-    // Gracefully handle video loading: only reveal when video is actually ready with playable data
-    const handleLoaded = () => {
-      if (video.videoWidth > 0 || video.readyState >= 2) {
-        video.classList.add('is-loaded');
-      }
-    };
-
-    if (video.readyState >= 2) {
-      handleLoaded();
-    } else {
-      video.addEventListener('canplay', handleLoaded, { once: true });
-      video.addEventListener('playing', handleLoaded, { once: true });
-      video.addEventListener('loadeddata', handleLoaded, { once: true });
-    }
-
-    // If video file does not exist (404 or missing asset), keep the CSS fallback placeholder visible
-    video.addEventListener('error', () => {
-      video.classList.remove('is-loaded');
-    });
-
-    if (prefersReducedMotion) {
-      video.pause();
-      return;
-    }
-
-    // IntersectionObserver: play when scrolled into view, pause when out of view (saves battery)
-    const videoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {
-              // Video play was prevented or asset missing; safe catch
-            });
-          }
-        } else {
-          video.pause();
-        }
-      });
-    }, {
-      threshold: 0.15
-    });
-
-    videoObserver.observe(video);
-  }
+  /* ------------------------------------------------------------------ *
+   * 11. Footer year — only when the markup opts in
+   * ------------------------------------------------------------------ */
+  const yearEl = $('[data-year]');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
 })();
